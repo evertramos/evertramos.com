@@ -1,0 +1,45 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ezyba-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - BACKEND_URL=http://backend:8000
+      - PUBLIC_TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+    networks:
+      - ezyba-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ezyba-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../data/logs:/tmp/logs
+    environment:
+      - ENVIRONMENT=production
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - NOTIFICATION_EMAILS=${NOTIFICATION_EMAILS}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+    env_file:
+      - .env
+    networks:
+      - ezyba-network
+    restart: unless-stopped
+
+networks:
+  ezyba-network:
+    driver: bridge

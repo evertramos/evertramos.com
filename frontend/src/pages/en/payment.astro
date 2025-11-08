@@ -1,0 +1,129 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PaymentForm from '../../components/PaymentForm.vue';
+
+const translations = {
+  'payment.title': 'Make Payment',
+  'payment.name': 'Full Name',
+  'payment.email': 'Email',
+  'payment.phone': 'Phone (optional)',
+  'payment.amount': 'Amount',
+  'payment.currency': 'Currency',
+  'payment.type': 'Payment Type',
+  'payment.type.one_time': 'One-time Payment',
+  'payment.type.monthly': 'Monthly',
+  'payment.type.yearly': 'Yearly',
+  'payment.submit': 'Process Payment',
+  'payment.processing': 'Processing...',
+  'success.payment': 'Payment processed successfully!',
+  'error.payment': 'Error processing payment. Please try again.'
+};
+---
+
+<Layout title="Evert Ramos|Payment" description="Payment for services rendered or support for open source projects">
+  <div class="py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+          Payment
+        </h1>
+        <p class="text-lg text-gray-600">
+          Services rendered or support for open source projects
+        </p>
+      </div>
+      
+      <!-- Payment types explanation -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Payment Types</h2>
+        <div class="space-y-4 text-gray-700">
+          <div class="border-l-4 border-blue-500 pl-4">
+            <h3 class="font-semibold text-lg">Recurring Payment</h3>
+            <p>Automatic monthly or yearly billing. Ideal for ongoing services or regular support for open source projects.</p>
+          </div>
+          <div class="border-l-4 border-green-500 pl-4">
+            <h3 class="font-semibold text-lg">One-time Payment</h3>
+            <p>Single charge for specific service rendered or one-time contribution to open source projects.</p>
+          </div>
+        </div>
+        
+        <div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+          <p class="text-sm text-gray-600">
+            <strong>Accepted currencies:</strong> US Dollars (USD) - global preference | Brazilian Real (BRL) - Brazil contracts only
+          </p>
+        </div>
+        
+        <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p class="text-sm text-yellow-800">
+            <strong>IMPORTANT:</strong> This payment <strong>does not create any obligation</strong> on our part to provide any service, 
+            unless we have a signed contract with valid digital certificate. 
+            By proceeding, you agree to our 
+            <a href="/en/terms" class="text-yellow-900 underline hover:text-yellow-700">Terms of Use</a> and 
+            <a href="/en/privacy" class="text-yellow-900 underline hover:text-yellow-700">Privacy Policy</a>.
+          </p>
+        </div>
+      </div>
+      
+      <!-- LGPD/GDPR Consent Notice -->
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+        <div class="flex items-start">
+          <svg class="w-5 h-5 text-gray-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div class="text-sm text-gray-700">
+            <p class="mb-2">
+              <strong>Data Protection:</strong> Your personal data will be processed temporarily 
+              only to facilitate payment via Stripe. We do not store credit card information.
+            </p>
+            <p>
+              <strong>Your rights:</strong> Access, correction, deletion and portability of data 
+              under LGPD/GDPR. Manage via 
+              <a href="/en/manage" class="text-blue-600 underline hover:text-blue-800">customer portal</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <PaymentForm client:load lang="en" translations={translations} />
+      
+      <!-- Security Notice -->
+      <div class="mt-8">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div class="flex items-start">
+            <svg class="w-6 h-6 text-blue-600 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            <div>
+              <h3 class="text-lg font-semibold text-blue-900 mb-2">
+                Guaranteed Security
+              </h3>
+              <ul class="text-blue-800 space-y-1 text-sm">
+                <li>• <strong>SSL/TLS Encryption</strong> in all communications</li>
+                <li>• <strong>Stripe PCI DSS Level 1</strong> - Maximum payment security</li>
+                <li>• <strong>Zero storage</strong> of credit card or sensitive data</li>
+                <li>• <strong>LGPD/GDPR Compliance</strong> - Data protection guaranteed</li>
+                <li>• <strong>3D Secure Authentication</strong> when required</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* Ensure form is responsive on all devices */
+  @media (max-width: 768px) {
+    .max-w-2xl {
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+  }
+  
+  /* Touch targets for mobile */
+  @media (max-width: 640px) {
+    button, input, select {
+      min-height: 44px;
+    }
+  }
+</style>

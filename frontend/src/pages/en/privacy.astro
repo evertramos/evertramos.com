@@ -1,0 +1,153 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Evert Ramos|Privacy">
+  <div class="py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-xl shadow-lg p-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
+        
+        <div class="prose prose-lg max-w-none">
+          <p class="text-gray-600 mb-6">
+            <strong>Last updated:</strong> January 2025
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Information We Process</h2>
+          <p class="text-gray-700 mb-4">
+            We process <strong>temporarily</strong> the following information to facilitate payment:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li>Full name</li>
+            <li>Email address</li>
+            <li>Phone number (optional)</li>
+            <li>Payment information (transmitted directly to Stripe)</li>
+          </ul>
+          <p class="text-gray-700 mb-6">
+            <strong>[IMPORTANT] We do not store</strong> this data on our servers. It is transmitted 
+            directly to Stripe (payment processor) and used only for sending email confirmations.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Legal Basis and Purpose</h2>
+          <p class="text-gray-700 mb-4">
+            We process your data based on <strong>consent</strong> and <strong>contract execution</strong>, 
+            exclusively to:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li>Transmit data to Stripe for payment processing</li>
+            <li>Send payment confirmation emails</li>
+            <li>Comply with legal and tax obligations</li>
+          </ul>
+          <p class="text-gray-700 mb-6">
+            <strong>Retention:</strong> We only keep transaction logs (without personal data) 
+            for audit and security purposes.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">3. Data Security</h2>
+          <p class="text-gray-700 mb-6">
+            <strong>We do not store</strong> credit card information. All payment data is processed 
+            directly by Stripe, which has PCI DSS Level 1 certification. We use SSL encryption 
+            and other security measures to protect your information.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">4. Data Sharing</h2>
+          <p class="text-gray-700 mb-6">
+            Your data is shared only with:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li><strong>Stripe Inc.</strong> - PCI DSS certified payment processor</li>
+            <li><strong>Competent authorities</strong> - When required by law</li>
+          </ul>
+          <p class="text-gray-700 mb-6">
+            <strong>We do not sell, rent, or commercialize</strong> your personal information 
+            under any circumstances.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">5. Your Rights</h2>
+          <p class="text-gray-700 mb-4">
+            Under LGPD (Brazil), GDPR (EU), CCPA (California) and PIPEDA (Canada), you have the right to:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li><strong>Access:</strong> Check what data we process about you</li>
+            <li><strong>Rectification:</strong> Correct incorrect or incomplete data</li>
+            <li><strong>Erasure:</strong> Request removal of your data ("right to be forgotten")</li>
+            <li><strong>Portability:</strong> Receive your data in structured format</li>
+            <li><strong>Opposition:</strong> Withdraw consent at any time</li>
+            <li><strong>Restriction:</strong> Limit processing in certain situations</li>
+          </ul>
+          <p class="text-gray-700 mb-6">
+            <strong>How to exercise your rights:</strong> Since we do not store your personal data, 
+            access and management should be done via <strong>Stripe customer portal</strong> 
+            ("Manage Subscription" option) or by contacting us to facilitate the process.
+          </p>
+          <p class="text-gray-700 mb-6">
+            <strong>Response time:</strong> Up to 15 business days (LGPD) or 30 days (GDPR/others).
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">6. Cookies and Technologies</h2>
+          <p class="text-gray-700 mb-6">
+            We only use <strong>essential cookies</strong> necessary for:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li>Basic site functionality</li>
+            <li>Secure payment processing via Stripe</li>
+            <li>Temporary security session</li>
+          </ul>
+          <p class="text-gray-700 mb-6">
+            <strong>We do not use:</strong> Tracking cookies, advertising, analytics or 
+            social media sharing.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">7. Contact and Authorities</h2>
+          <p class="text-gray-700 mb-6">
+            <strong>Data Controller:</strong> Evert Leal Ramos
+          </p>
+          <p class="text-gray-700 mb-6">
+            For privacy questions, contact us:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li>GitHub: <a href="https://github.com/evertramos" class="text-blue-600 hover:underline">@evertramos</a></li>
+            <li>Email: <span id="email-contact" class="text-blue-600 cursor-pointer hover:underline"></span></li>
+          </ul>
+          <p class="text-gray-700 mb-6">
+            <strong>Right to complaint:</strong> You may file complaints with competent authorities 
+            (ANPD in Brazil, data protection authorities in EU, etc.).
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">8. International Transfer</h2>
+          <p class="text-gray-700 mb-6">
+            Your data may be transmitted to <strong>Stripe Inc.</strong> (United States), 
+            which has <strong>recognized adequacy</strong> and implements appropriate safeguards 
+            as required by data protection legislation.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">9. Changes</h2>
+          <p class="text-gray-700 mb-6">
+            This policy may be updated at any time. We recommend reviewing this page 
+            periodically to stay informed.
+          </p>
+          <p class="text-gray-700 mb-6">
+            <strong>Substantial changes</strong> that affect your rights will be communicated 
+            with reasonable advance notice through the website.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Build email dynamically to avoid bots
+  document.addEventListener('DOMContentLoaded', function() {
+    const emailElement = document.getElementById('email-contact');
+    if (emailElement) {
+      const user = 'evert.ramos';
+      const domain = 'gmail.com';
+      const email = user + '@' + domain;
+      emailElement.textContent = email;
+      emailElement.onclick = function() {
+        window.location.href = 'mailto:' + email;
+      };
+    }
+  });
+</script>

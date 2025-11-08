@@ -1,0 +1,262 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Gerador de Links - Evert Ramos">
+  <Fragment slot="head">
+    <meta name="robots" content="noindex, nofollow" />
+  </Fragment>
+  <div class="py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-xl shadow-lg p-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-8">Gerador de Links de Pagamento</h1>
+        
+        <form id="linkGenerator" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                Nome do Cliente
+              </label>
+              <input
+                type="text"
+                id="name"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="John Doe"
+              />
+            </div>
+            
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                Email do Cliente
+              </label>
+              <input
+                type="email"
+                id="email"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="john@example.com"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+              Telefone (opcional)
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="+1 555 123-4567"
+            />
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label for="amount" class="block text-sm font-medium text-gray-700 mb-2">
+                Valor *
+              </label>
+              <input
+                type="number"
+                id="amount"
+                required
+                min="1.00"
+                step="0.01"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="100.00"
+              />
+            </div>
+            
+            <div>
+              <label for="currency" class="block text-sm font-medium text-gray-700 mb-2">
+                Moeda
+              </label>
+              <select
+                id="currency"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="usd">USD ($)</option>
+                <option value="brl">BRL (R$)</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="paymentType" class="block text-sm font-medium text-gray-700 mb-2">
+                Tipo de Pagamento
+              </label>
+              <select
+                id="paymentType"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="one_time">Pagamento Único</option>
+                <option value="monthly">Mensal</option>
+                <option value="yearly">Anual</option>
+              </select>
+            </div>
+          </div>
+          
+          <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200"
+          >
+            Gerar Links de Pagamento
+          </button>
+        </form>
+        
+        <div id="generatedLinks" class="mt-8 hidden">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Links Gerados</h2>
+          
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Link em Português
+              </label>
+              <div class="flex">
+                <input
+                  type="text"
+                  id="linkPT"
+                  readonly
+                  class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg bg-gray-50 text-sm"
+                />
+                <button
+                  type="button"
+                  onclick="copyToClipboard('linkPT')"
+                  class="px-4 py-3 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700 transition-colors"
+                >
+                  Copiar
+                </button>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Link em Inglês
+              </label>
+              <div class="flex">
+                <input
+                  type="text"
+                  id="linkEN"
+                  readonly
+                  class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg bg-gray-50 text-sm"
+                />
+                <button
+                  type="button"
+                  onclick="copyToClipboard('linkEN')"
+                  class="px-4 py-3 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700 transition-colors"
+                >
+                  Copiar
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-blue-800 text-sm">
+              <strong>Dica:</strong> O cliente pode trocar entre PT/EN clicando no botão de idioma e os dados permanecerão preenchidos.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Global function for copying to clipboard
+  window.copyToClipboard = async function(elementId) {
+    const element = document.getElementById(elementId);
+    const button = element.nextElementSibling;
+    const originalText = button.textContent;
+    
+    try {
+      await navigator.clipboard.writeText(element.value);
+      
+      // Visual feedback
+      button.textContent = 'Copiado!';
+      button.classList.add('bg-green-600');
+      button.classList.remove('bg-blue-600');
+      
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.classList.remove('bg-green-600');
+        button.classList.add('bg-blue-600');
+      }, 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      element.select();
+      element.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      
+      button.textContent = 'Copiado!';
+      button.classList.add('bg-green-600');
+      button.classList.remove('bg-blue-600');
+      
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.classList.remove('bg-green-600');
+        button.classList.add('bg-blue-600');
+      }, 2000);
+    }
+  }
+  
+  function saveFormData() {
+    const formData = {
+      name: document.getElementById('name').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value,
+      amount: document.getElementById('amount').value,
+      currency: document.getElementById('currency').value,
+      paymentType: document.getElementById('paymentType').value
+    };
+    
+    // Only save if there's meaningful data
+    if (formData.name || formData.email || formData.amount) {
+      try {
+        localStorage.setItem('ezyba_form_data', JSON.stringify(formData));
+      } catch (error) {
+        console.warn('Failed to save form data:', error);
+      }
+    }
+  }
+  
+  // Generator page doesn't load saved data - starts fresh
+  document.addEventListener('DOMContentLoaded', function() {
+    // Save form data on input changes (but don't load existing data)
+    const inputs = ['name', 'email', 'phone', 'amount', 'currency', 'paymentType'];
+    inputs.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.addEventListener('input', saveFormData);
+        element.addEventListener('change', saveFormData);
+      }
+    });
+  });
+  
+  document.getElementById('linkGenerator').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const amount = document.getElementById('amount').value;
+    const currency = document.getElementById('currency').value;
+    const paymentType = document.getElementById('paymentType').value;
+    
+    const params = new URLSearchParams();
+    if (name) params.append('name', encodeURIComponent(name));
+    if (email) params.append('email', encodeURIComponent(email));
+    if (phone) params.append('phone', encodeURIComponent(phone));
+    if (amount) params.append('amount', amount);
+    if (currency && currency !== 'usd') params.append('currency', currency);
+    if (paymentType && paymentType !== 'one_time') params.append('type', paymentType);
+    
+    const baseUrlPT = window.location.origin + '/pagamento';
+    const baseUrlEN = window.location.origin + '/en/payment';
+    
+    const linkPT = baseUrlPT + '?' + params.toString();
+    const linkEN = baseUrlEN + '?' + params.toString();
+    
+    document.getElementById('linkPT').value = linkPT;
+    document.getElementById('linkEN').value = linkEN;
+    document.getElementById('generatedLinks').classList.remove('hidden');
+  });
+</script>

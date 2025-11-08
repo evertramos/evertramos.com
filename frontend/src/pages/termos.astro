@@ -1,0 +1,148 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Evert Ramos|Termos">
+  <div class="py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-xl shadow-lg p-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-8">Termos de Uso</h1>
+        
+        <div class="prose prose-lg max-w-none">
+          <p class="text-gray-600 mb-6">
+            <strong>Última atualização:</strong> Janeiro de 2025
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Aceitação dos Termos</h2>
+          <p class="text-gray-700 mb-6">
+            Ao utilizar este site e realizar pagamentos, você concorda com estes termos de uso. 
+            Se não concordar, não utilize nossos serviços.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Natureza dos Pagamentos</h2>
+          <p class="text-gray-700 mb-4">
+            Os pagamentos realizados através desta plataforma podem ser para:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li>Serviços técnicos prestados</li>
+            <li>Apoio a projetos open source</li>
+            <li>Contribuições voluntárias</li>
+          </ul>
+          
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <p class="text-yellow-800 font-semibold">
+              IMPORTANTE: Este pagamento não gera obrigação de nossa parte para prestar qualquer serviço, 
+              salvo se tivermos contrato assinado com certificado digital válido.
+            </p>
+          </div>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">3. Processamento de Pagamentos</h2>
+          <p class="text-gray-700 mb-6">
+            Todos os pagamentos são processados pela Stripe. Não armazenamos informações de cartão de crédito. 
+            Você é responsável por fornecer informações de pagamento precisas e válidas.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">4. Reembolsos e Taxas Administrativas</h2>
+          <p class="text-gray-700 mb-4">
+            Reembolsos são analisados caso a caso. <strong>Para solicitar reembolso, entre em contato 
+            ESTRITAMENTE por email:</strong> <span id="email-refund" class="text-blue-600 cursor-pointer hover:underline font-semibold"></span>. 
+            Contribuições para projetos open source geralmente não são reembolsáveis.
+          </p>
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p class="text-red-800 font-semibold mb-2">CLÁUSULA DE TAXA ADMINISTRATIVA:</p>
+            <p class="text-red-700 text-sm">
+              Em caso de reembolso, será obrigatoriamente deduzida a taxa de processamento cobrada pela Stripe, 
+              independentemente do motivo do reembolso, incluindo pagamentos realizados por equívoco ou erro do usuário. 
+              Esta dedução é irrevogável e irrenunciável, constituindo condição essencial para a prestação do serviço. 
+              O valor reembolsado será sempre o valor líquido após a dedução das taxas de processamento e administrativas 
+              incorridas junto ao provedor de pagamentos.
+            </p>
+          </div>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">5. Uso Aceitável</h2>
+          <p class="text-gray-700 mb-4">
+            Você concorda em não:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li>Usar o site para atividades ilegais</li>
+            <li>Tentar contornar medidas de segurança</li>
+            <li>Realizar pagamentos fraudulentos</li>
+            <li>Interferir no funcionamento do site</li>
+          </ul>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">6. Limitação de Responsabilidade</h2>
+          <p class="text-gray-700 mb-6">
+            Este site é fornecido "como está". Não garantimos disponibilidade contínua ou ausência de erros. 
+            Nossa responsabilidade é limitada ao valor do pagamento realizado, <strong>respeitando os direitos 
+            inderrogáveis do consumidor</strong> conforme legislação aplicável.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">7. Propriedade Intelectual</h2>
+          <p class="text-gray-700 mb-6">
+            O conteúdo deste site é protegido por direitos autorais. Projetos open source mantêm suas 
+            respectivas licenças.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">8. Lei Aplicável e Jurisdição</h2>
+          <p class="text-gray-700 mb-6">
+            Estes termos são regidos pelas leis brasileiras. Para usuários internacionais, 
+            aplicam-se também as legislações locais de proteção ao consumidor e dados pessoais 
+            (GDPR, CCPA, PIPEDA, etc.). Disputas serão resolvidas preferencialmente por 
+            mediação ou nos tribunais competentes do Brasil.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">9. Contato</h2>
+          <p class="text-gray-700 mb-6">
+            Para questões sobre estes termos, entre em contato:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li>GitHub: <a href="https://github.com/evertramos" class="text-blue-600 hover:underline">@evertramos</a></li>
+            <li>Email: <span id="email-contact" class="text-blue-600 cursor-pointer hover:underline"></span></li>
+          </ul>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">10. Direitos do Consumidor</h2>
+          <p class="text-gray-700 mb-6">
+            <strong>Nada nestes termos limita seus direitos como consumidor</strong> conforme 
+            Código de Defesa do Consumidor (Brasil), GDPR (UE), CCPA (Califórnia) ou 
+            legislações similares. Em caso de conflito, prevalecem as normas de proteção 
+            ao consumidor.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">11. Alterações</h2>
+          <p class="text-gray-700 mb-6">
+            Estes termos podem ser atualizados a qualquer momento. <strong>Alterações substanciais</strong> 
+            que afetem seus direitos serão comunicadas com antecedência razoável. 
+            O uso continuado após as alterações constitui aceitação dos novos termos.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Constrói o email dinamicamente para evitar bots
+  document.addEventListener('DOMContentLoaded', function() {
+    const user = 'evert.ramos';
+    const domain = 'gmail.com';
+    const email = user + '@' + domain;
+    
+    // Email para contato geral
+    const emailContactElement = document.getElementById('email-contact');
+    if (emailContactElement) {
+      emailContactElement.textContent = email;
+      emailContactElement.onclick = function() {
+        window.location.href = 'mailto:' + email;
+      };
+    }
+    
+    // Email para reembolsos
+    const emailRefundElement = document.getElementById('email-refund');
+    if (emailRefundElement) {
+      emailRefundElement.textContent = email;
+      emailRefundElement.onclick = function() {
+        window.location.href = 'mailto:' + email + '?subject=Solicita%C3%A7%C3%A3o%20de%20Reembolso';
+      };
+    }
+  });
+</script>

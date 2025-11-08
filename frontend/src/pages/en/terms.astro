@@ -1,0 +1,146 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Evert Ramos|Terms">
+  <div class="py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-xl shadow-lg p-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-8">Terms of Use</h1>
+        
+        <div class="prose prose-lg max-w-none">
+          <p class="text-gray-600 mb-6">
+            <strong>Last updated:</strong> January 2025
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Acceptance of Terms</h2>
+          <p class="text-gray-700 mb-6">
+            By using this website and making payments, you agree to these terms of use. 
+            If you do not agree, please do not use our services.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Nature of Payments</h2>
+          <p class="text-gray-700 mb-4">
+            Payments made through this platform may be for:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li>Technical services rendered</li>
+            <li>Support for open source projects</li>
+            <li>Voluntary contributions</li>
+          </ul>
+          
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <p class="text-yellow-800 font-semibold">
+              IMPORTANT: This payment does not create any obligation on our part to provide any service, 
+              unless we have a signed contract with valid digital certificate.
+            </p>
+          </div>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">3. Payment Processing</h2>
+          <p class="text-gray-700 mb-6">
+            All payments are processed by Stripe. We do not store credit card information. 
+            You are responsible for providing accurate and valid payment information.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">4. Refunds and Administrative Fees</h2>
+          <p class="text-gray-700 mb-4">
+            Refunds are analyzed case by case. <strong>To request a refund, contact us 
+            STRICTLY by email:</strong> <span id="email-refund" class="text-blue-600 cursor-pointer hover:underline font-semibold"></span>. 
+            Contributions to open source projects are generally non-refundable.
+          </p>
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p class="text-red-800 font-semibold mb-2">ADMINISTRATIVE FEE CLAUSE:</p>
+            <p class="text-red-700 text-sm">
+              In case of refund, the processing fee charged by Stripe will be mandatorily deducted, 
+              regardless of the reason for the refund, including payments made by mistake or user error. 
+              This deduction is irrevocable and non-waivable, constituting an essential condition for service provision. 
+              The refunded amount will always be the net amount after deduction of processing and administrative fees 
+              incurred with the payment provider.
+            </p>
+          </div>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">5. Acceptable Use</h2>
+          <p class="text-gray-700 mb-4">
+            You agree not to:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li>Use the site for illegal activities</li>
+            <li>Attempt to bypass security measures</li>
+            <li>Make fraudulent payments</li>
+            <li>Interfere with site functionality</li>
+          </ul>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">6. Limitation of Liability</h2>
+          <p class="text-gray-700 mb-6">
+            This site is provided "as is". We do not guarantee continuous availability or absence of errors. 
+            Our liability is limited to the amount of payment made, <strong>respecting non-waivable 
+            consumer rights</strong> under applicable legislation.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">7. Intellectual Property</h2>
+          <p class="text-gray-700 mb-6">
+            The content of this site is protected by copyright. Open source projects maintain their 
+            respective licenses.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">8. Governing Law and Jurisdiction</h2>
+          <p class="text-gray-700 mb-6">
+            These terms are governed by Brazilian law. For international users, local consumer 
+            protection and data privacy legislation also apply (GDPR, CCPA, PIPEDA, etc.). 
+            Disputes will be resolved preferably through mediation or in the competent courts of Brazil.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">9. Contact</h2>
+          <p class="text-gray-700 mb-6">
+            For questions about these terms, contact us:
+          </p>
+          <ul class="list-disc pl-6 text-gray-700 mb-6">
+            <li>GitHub: <a href="https://github.com/evertramos" class="text-blue-600 hover:underline">@evertramos</a></li>
+            <li>Email: <span id="email-contact" class="text-blue-600 cursor-pointer hover:underline"></span></li>
+          </ul>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">10. Consumer Rights</h2>
+          <p class="text-gray-700 mb-6">
+            <strong>Nothing in these terms limits your rights as a consumer</strong> under 
+            Consumer Defense Code (Brazil), GDPR (EU), CCPA (California) or similar legislation. 
+            In case of conflict, consumer protection laws prevail.
+          </p>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">11. Changes</h2>
+          <p class="text-gray-700 mb-6">
+            These terms may be updated at any time. <strong>Substantial changes</strong> 
+            that affect your rights will be communicated with reasonable advance notice. 
+            Continued use after changes constitutes acceptance of the new terms.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Build email dynamically to avoid bots
+  document.addEventListener('DOMContentLoaded', function() {
+    const user = 'evert.ramos';
+    const domain = 'gmail.com';
+    const email = user + '@' + domain;
+    
+    // Email for general contact
+    const emailContactElement = document.getElementById('email-contact');
+    if (emailContactElement) {
+      emailContactElement.textContent = email;
+      emailContactElement.onclick = function() {
+        window.location.href = 'mailto:' + email;
+      };
+    }
+    
+    // Email for refunds
+    const emailRefundElement = document.getElementById('email-refund');
+    if (emailRefundElement) {
+      emailRefundElement.textContent = email;
+      emailRefundElement.onclick = function() {
+        window.location.href = 'mailto:' + email + '?subject=Refund%20Request';
+      };
+    }
+  });
+</script>

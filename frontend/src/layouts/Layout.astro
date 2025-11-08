@@ -1,0 +1,234 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n';
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Secure payment processing with Ezyba" } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Function to get the equivalent URL in the other language
+const getAlternateUrl = (currentPath: string, currentLang: string, searchParams: string) => {
+  let newPath = '';
+  
+  if (currentLang === 'pt') {
+    // Portuguese to English
+    if (currentPath === '/') newPath = '/en';
+    else if (currentPath === '/pagamento') newPath = '/en/payment';
+    else if (currentPath === '/privacidade') newPath = '/en/privacy';
+    else if (currentPath === '/termos') newPath = '/en/terms';
+    else if (currentPath === '/admin/gerador') newPath = '/en/admin/generator';
+    else newPath = `/en${currentPath}`;
+  } else {
+    // English to Portuguese
+    if (currentPath === '/en' || currentPath === '/en/') newPath = '/';
+    else if (currentPath === '/en/payment') newPath = '/pagamento';
+    else if (currentPath === '/en/privacy') newPath = '/privacidade';
+    else if (currentPath === '/en/terms') newPath = '/termos';
+    else if (currentPath === '/en/admin/generator') newPath = '/admin/gerador';
+    else newPath = currentPath.replace('/en', '') || '/';
+  }
+  
+  return searchParams ? `${newPath}?${searchParams}` : newPath;
+};
+
+const alternateUrl = getAlternateUrl(Astro.url.pathname, lang, Astro.url.search.slice(1));
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.stripe.com https://merchant-ui-api.stripe.com https://pay.ezyba.com https://challenges.cloudflare.com http://localhost:8000; frame-src https://challenges.cloudflare.com https://js.stripe.com;" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    
+    <!-- Block Search Engines -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
+    <meta name="duckduckbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
+    
+    <!-- Custom head content -->
+    <slot name="head" />
+    
+    <!-- No Language Alternates (blocked from indexing) -->
+    
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <!-- Cloudflare Turnstile -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    
+    <!-- Mobile menu script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuButton && mobileMenu) {
+          mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+          });
+        }
+        
+        // Pass form data via URL parameters when switching language
+        const languageSwitchers = document.querySelectorAll('a[href*="EN"], a[href*="PT"]');
+        languageSwitchers.forEach(link => {
+          link.addEventListener('click', function(e) {
+            const isPaymentPage = window.location.pathname.includes('payment') || window.location.pathname.includes('pagamento');
+            const isGeneratorPage = window.location.pathname.includes('generator') || window.location.pathname.includes('gerador');
+            
+            if (isPaymentPage || isGeneratorPage) {
+              e.preventDefault();
+              
+              const params = new URLSearchParams();
+              const name = document.getElementById('name')?.value;
+              const email = document.getElementById('email')?.value;
+              const phone = document.getElementById('phone')?.value;
+              const amount = document.getElementById('amount')?.value;
+              const currency = document.getElementById('currency')?.value;
+              const paymentType = (document.getElementById('payment-type') || document.getElementById('paymentType'))?.value;
+              
+              // Add parameters only if they have values
+              if (name) params.append('name', encodeURIComponent(name));
+              if (email) params.append('email', encodeURIComponent(email));
+              if (phone) params.append('phone', encodeURIComponent(phone));
+              if (amount) params.append('amount', amount);
+              if (currency && currency !== 'usd') params.append('currency', currency);
+              if (paymentType && paymentType !== 'one_time') params.append('type', paymentType);
+              
+              // Navigate to new URL with parameters
+              const targetUrl = link.href + (params.toString() ? '?' + params.toString() : '');
+              window.location.href = targetUrl;
+            }
+          });
+        });
+      });
+      
+      // Auto-fill form from URL parameters on page load
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('name') || urlParams.has('email') || urlParams.has('amount')) {
+        const nameField = document.getElementById('name');
+        const emailField = document.getElementById('email');
+        const phoneField = document.getElementById('phone');
+        const amountField = document.getElementById('amount');
+        const currencyField = document.getElementById('currency');
+        const typeField = document.getElementById('payment-type') || document.getElementById('paymentType');
+        
+        if (nameField && urlParams.get('name')) nameField.value = decodeURIComponent(urlParams.get('name'));
+        if (emailField && urlParams.get('email')) emailField.value = decodeURIComponent(urlParams.get('email'));
+        if (phoneField && urlParams.get('phone')) phoneField.value = decodeURIComponent(urlParams.get('phone'));
+        if (amountField && urlParams.get('amount')) amountField.value = urlParams.get('amount');
+        if (currencyField && urlParams.get('currency')) currencyField.value = urlParams.get('currency');
+        if (typeField && urlParams.get('type')) typeField.value = urlParams.get('type');
+      }
+    </script>
+  </head>
+  <body class="min-h-screen bg-gray-50 flex flex-col">
+    <header class="bg-white shadow-sm border-b">
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <a href={lang === 'pt' ? '/' : '/en'} class="flex items-center space-x-3">
+              <img src="/images/logo.jpg" alt="Evert Ramos" class="h-8 w-8" />
+              <!-- <span class="text-2xl font-bold text-blue-600">Evert Ramos</span> -->
+            </a>
+          </div>
+          
+          <div class="hidden md:flex items-center space-x-8">
+            <a href={lang === 'pt' ? '/' : '/en'} class="text-gray-700 hover:text-blue-600 transition-colors">
+              {t('nav.home')}
+            </a>
+            <a href={lang === 'pt' ? '/pagamento' : '/en/payment'} class="text-gray-700 hover:text-blue-600 transition-colors">
+              {t('nav.payment')}
+            </a>
+            <a href={lang === 'pt' ? '/gerenciar' : '/en/manage'} class="text-gray-700 hover:text-blue-600 transition-colors">
+              {t('nav.manage')}
+            </a>
+          </div>
+          
+          <!-- Mobile menu button -->
+          <div class="md:hidden flex items-center space-x-2">
+            <a 
+              href={alternateUrl}
+              class="px-3 py-1 text-sm border rounded-md hover:bg-gray-100 transition-colors"
+            >
+              {lang === 'pt' ? 'EN' : 'PT'}
+            </a>
+            <button 
+              id="mobile-menu-button"
+              class="p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Desktop language switcher -->
+          <div class="hidden md:flex items-center space-x-2">
+            <a 
+              href={alternateUrl}
+              class="px-3 py-1 text-sm border rounded-md hover:bg-gray-100 transition-colors"
+            >
+              {lang === 'pt' ? 'EN' : 'PT'}
+            </a>
+          </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden pb-4 hidden">
+          <div class="flex flex-col space-y-2 pt-4 border-t">
+            <a href={lang === 'pt' ? '/' : '/en'} class="text-gray-700 hover:text-blue-600 transition-colors py-2">
+              {t('nav.home')}
+            </a>
+            <a href={lang === 'pt' ? '/pagamento' : '/en/payment'} class="text-gray-700 hover:text-blue-600 transition-colors py-2">
+              {t('nav.payment')}
+            </a>
+            <a href={lang === 'pt' ? '/gerenciar' : '/en/manage'} class="text-gray-700 hover:text-blue-600 transition-colors py-2">
+              {t('nav.manage')}
+            </a>
+          </div>
+        </div>
+      </nav>
+    </header>
+    
+    <main class="flex-1">
+      <slot />
+    </main>
+    
+    <footer class="bg-white border-t mt-auto">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="text-gray-600 text-sm mb-4 md:mb-0">
+            © 1990-2025 Evert Ramos. All rights reserved.
+          </div>
+          
+          <div class="flex items-center space-x-6 text-sm">
+            <a href={lang === 'pt' ? '/privacidade' : '/en/privacy'} class="text-gray-600 hover:text-blue-600 transition-colors">
+              {t('footer.privacy')}
+            </a>
+            <a href={lang === 'pt' ? '/termos' : '/en/terms'} class="text-gray-600 hover:text-blue-600 transition-colors">
+              {t('footer.terms')}
+            </a>
+          </div>
+        </div>
+        
+        <div class="mt-4 text-center text-xs text-gray-500">
+          {t('footer.secure')}
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

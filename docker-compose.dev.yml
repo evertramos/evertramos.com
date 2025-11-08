@@ -1,0 +1,58 @@
+services:
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: ezyba-mailpit
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - ezyba-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: ezyba-frontend-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PUBLIC_BACKEND_URL=http://localhost:8000
+      - PUBLIC_TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+    networks:
+      - ezyba-network
+    command: npm run dev
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: ezyba-backend-dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - ENVIRONMENT=development
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - NOTIFICATION_EMAILS=${NOTIFICATION_EMAILS}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+    env_file:
+      - .env
+    networks:
+      - ezyba-network
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+networks:
+  ezyba-network:
+    driver: bridge

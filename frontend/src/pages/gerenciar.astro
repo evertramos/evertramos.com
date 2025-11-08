@@ -1,0 +1,200 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Evert Ramos|Gerenciar" description="Gerencie suas assinaturas e dados pessoais via portal seguro do Stripe">
+  <div class="py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+          Gerenciar Conta
+        </h1>
+        <p class="text-lg text-gray-600">
+          Acesse o portal seguro para gerenciar suas assinaturas e dados
+        </p>
+      </div>
+      
+      <!-- LGPD/GDPR Notice -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div class="flex items-start">
+          <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div class="text-sm text-blue-800">
+            <p class="mb-2">
+              <strong>Exercício de Direitos LGPD/GDPR:</strong> Este portal permite exercer seus direitos 
+              de acesso, correção, exclusão e portabilidade de dados pessoais conforme legislação aplicável.
+            </p>
+            <p>
+              <strong>Processamento:</strong> Seus dados são processados pela Stripe Inc. (EUA) com adequação 
+              reconhecida. Ao acessar, você confirma a identidade via email cadastrado.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Portal Access Card -->
+      <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+        <div class="text-center">
+          <div class="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Portal do Cliente Stripe</h2>
+          <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
+            Acesse o portal seguro do Stripe para gerenciar suas assinaturas e dados. 
+            O Stripe solicitará seu email para autenticação segura.
+          </p>
+          
+          <button
+            id="portalButton"
+            class="bg-blue-600 text-white py-3 px-8 rounded-lg text-lg font-semibold hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200"
+          >
+            Acessar Portal Seguro
+          </button>
+        </div>
+      </div>
+      
+      <!-- What you can do -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">O que você pode fazer no portal:</h2>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-1">
+                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Gerenciar Assinaturas</h3>
+                <p class="text-sm text-gray-600">Pausar, cancelar ou alterar planos recorrentes</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-1">
+                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Histórico de Pagamentos</h3>
+                <p class="text-sm text-gray-600">Visualizar e baixar recibos de transações</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-1">
+                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Atualizar Dados</h3>
+                <p class="text-sm text-gray-600">Alterar informações pessoais e de cobrança</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-1">
+                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Métodos de Pagamento</h3>
+                <p class="text-sm text-gray-600">Adicionar, remover ou alterar cartões</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-1">
+                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Exercer Direitos LGPD</h3>
+                <p class="text-sm text-gray-600">Acessar, corrigir ou excluir dados pessoais</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-1">
+                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900">Suporte Direto</h3>
+                <p class="text-sm text-gray-600">Contato direto com equipe de suporte</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Security Notice -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div class="flex items-start">
+          <svg class="w-6 h-6 text-blue-600 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+          <div>
+            <h3 class="text-lg font-semibold text-blue-900 mb-2">
+              Segurança Garantida pelo Stripe
+            </h3>
+            <ul class="text-blue-800 space-y-1 text-sm">
+              <li>• <strong>Autenticação por email</strong> - Acesso seguro via link temporário</li>
+              <li>• <strong>Criptografia de ponta a ponta</strong> - Dados protegidos em trânsito</li>
+              <li>• <strong>Conformidade PCI DSS Nível 1</strong> - Máxima segurança financeira</li>
+              <li>• <strong>Auditoria completa</strong> - Todas as ações são registradas</li>
+              <li>• <strong>Sessão temporária</strong> - Acesso expira automaticamente</li>
+            </ul>
+            
+            <div class="mt-4 p-3 bg-blue-100 rounded-lg">
+              <p class="text-sm text-blue-800 mb-2">
+                <strong>Importante:</strong> Nunca compartilhe o link de acesso ao portal. 
+                Ele é pessoal e intransferível, válido apenas para o email informado.
+              </p>
+              <p class="text-sm text-blue-800">
+                <strong>Prazo de resposta:</strong> Solicitações de exercício de direitos são 
+                processadas em até 15 dias úteis (LGPD) ou 30 dias (GDPR).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script define:vars={{ portalUrl: import.meta.env.CUSTOMER_PORTAL_URL }}>
+    document.getElementById('portalButton').addEventListener('click', async () => {
+      try {
+        const response = await fetch(portalUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const data = await response.json();
+        
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert('Erro ao acessar portal. Tente novamente.');
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao acessar portal. Tente novamente.');
+      }
+    });
+  </script>
+</Layout>
