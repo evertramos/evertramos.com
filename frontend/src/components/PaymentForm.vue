@@ -108,7 +108,7 @@
       <!-- Stripe Elements Container -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Informações do Cartão *
+          {{ t('payment.card_info') }} *
         </label>
         <div id="card-element" class="p-4 border border-gray-300 rounded-lg bg-white">
           <!-- Stripe Elements will create form elements here -->
@@ -119,7 +119,7 @@
       <!-- Cloudflare Turnstile -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Verificação de Segurança *
+          {{ t('payment.security_check') }} *
         </label>
         <div id="turnstile-widget" class="flex justify-center">
           <!-- Turnstile widget will be rendered here -->
@@ -138,10 +138,10 @@
             :class="{ 'border-red-500': termsError }"
           />
           <label for="terms" class="text-sm text-gray-700">
-            Li e aceito os 
-            <a :href="props.lang === 'pt' ? '/termos' : '/en/terms'" target="_blank" class="text-blue-600 hover:underline font-medium">Termos de Uso</a>
-            e a 
-            <a :href="props.lang === 'pt' ? '/privacidade' : '/en/privacy'" target="_blank" class="text-blue-600 hover:underline font-medium">Política de Privacidade</a>
+            {{ t('payment.terms_accept') }} 
+            <a :href="props.lang === 'pt' ? '/termos' : '/en/terms'" target="_blank" class="text-blue-600 hover:underline font-medium">{{ t('payment.terms_link') }}</a>
+            {{ props.lang === 'pt' ? 'e a' : 'and' }} 
+            <a :href="props.lang === 'pt' ? '/privacidade' : '/en/privacy'" target="_blank" class="text-blue-600 hover:underline font-medium">{{ t('payment.privacy_link') }}</a>
             *
           </label>
         </div>
@@ -190,12 +190,29 @@
       </div>
     </div>
   </div>
+  
+  <!-- Processing Overlay -->
+  <div v-if="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">
+        {{ t('payment.processing_title') }}
+      </h3>
+      <p class="text-gray-600 text-sm">
+        {{ t('payment.processing_message') }}
+      </p>
+      <div class="mt-4 text-xs text-gray-500">
+        {{ t('payment.processing_wait') }}
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
 import { loadStripe } from '@stripe/stripe-js'
 import { saveFormData, loadFormData, clearFormData, type FormData } from '../utils/formPersistence'
+import { generateSuccessToken } from '../utils/successToken'
 
 // Props
 interface Props {
@@ -246,14 +263,16 @@ const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || 'https://pay.ezyba.com
 // Initialize Turnstile
 const initializeTurnstile = () => {
   if (window.turnstile) {
+    const sitekey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'
     turnstile = window.turnstile.render('#turnstile-widget', {
-      sitekey: '1x00000000000000000000AA', // Test key - always passes
+      sitekey: sitekey,
+      language: props.lang, // Set language based on page language
       callback: (token: string) => {
         turnstileToken.value = token
         turnstileError.value = ''
       },
       'error-callback': () => {
-        turnstileError.value = 'Erro na verificação de segurança. Tente novamente.'
+        turnstileError.value = t('payment.security_error')
         turnstileToken.value = ''
       }
     })
@@ -270,7 +289,9 @@ const initializeStripe = async () => {
     const config = await response.json()
     
     stripe = await loadStripe(config.publishable_key)
-    elements = stripe.elements()
+    elements = stripe.elements({
+      locale: props.lang
+    })
     
     // Create card element
     cardElement = elements.create('card', {
@@ -282,7 +303,7 @@ const initializeStripe = async () => {
             color: '#aab7c4',
           },
         },
-      },
+      }
     })
     
     cardElement.mount('#card-element')
@@ -294,7 +315,7 @@ const initializeStripe = async () => {
     
   } catch (error) {
     console.error('Error initializing Stripe:', error)
-    showError('Erro ao carregar sistema de pagamento. Tente novamente.')
+    showError(t('payment.stripe_error') || 'Error loading payment system. Please try again.')
   }
 }
 
@@ -310,28 +331,28 @@ const validateForm = () => {
   let isValid = true
   
   if (!form.name || form.name.length < 2) {
-    errors.name = 'Nome deve ter pelo menos 2 caracteres'
+    errors.name = t('validation.name_required')
     isValid = false
   }
   
   if (!form.email || !form.email.includes('@')) {
-    errors.email = 'Email inválido'
+    errors.email = t('validation.email_invalid')
     isValid = false
   }
   
   const amount = parseFloat(form.amount)
   if (!amount || amount < 1.0) {
-    errors.amount = 'Valor mínimo é $1.00 ou R$1.00'
+    errors.amount = t('validation.amount_minimum')
     isValid = false
   }
   
   if (!turnstileToken.value) {
-    turnstileError.value = 'Verificação de segurança obrigatória'
+    turnstileError.value = t('validation.security_required')
     isValid = false
   }
   
   if (!termsAccepted.value) {
-    termsError.value = 'Você deve aceitar os termos de uso'
+    termsError.value = t('validation.terms_required')
     isValid = false
   }
   
@@ -341,7 +362,7 @@ const validateForm = () => {
 // Handle form submission
 const handleSubmit = async () => {
   if (!stripe || !cardElement) {
-    showError('Sistema de pagamento não carregado. Recarregue a página.')
+    showError(t('error.payment_system_not_loaded'))
     return
   }
   
@@ -376,7 +397,7 @@ const handleSubmit = async () => {
     const result = await response.json()
     
     if (!result.success) {
-      throw new Error(result.message || 'Erro ao processar pagamento')
+      throw new Error(result.message || 'Payment processing failed')
     }
     
     // Confirm payment with Stripe
@@ -395,21 +416,30 @@ const handleSubmit = async () => {
       throw new Error(error.message)
     }
     
-    showSuccess()
-    resetForm()
+    // Extract payment info for success token
+    const paymentAmount = Math.round(parseFloat(form.amount) * 100)
+    showSuccess(result.payment_id, paymentAmount, form.currency)
+    // Don't reset form or stop loading until redirect
     
   } catch (error: any) {
     console.error('Payment error:', error)
-    showError(error.message || 'Erro ao processar pagamento. Tente novamente.')
+    showError(error.message || t('error.payment_failed'))
+    loading.value = false // Only stop loading on error
   }
   
-  loading.value = false
+  // Don't set loading.value = false on success - let redirect handle it
 }
 
 // Helper functions
-const showSuccess = () => {
-  success.value = true
-  message.value = t('success.payment')
+const showSuccess = (paymentId?: string, amount?: number, currency?: string) => {
+  // Generate success token with payment info
+  const token = generateSuccessToken(paymentId, amount, currency)
+  
+  // Redirect to success page after 1.5 seconds
+  setTimeout(() => {
+    const successUrl = props.lang === 'pt' ? '/sucesso' : '/en/success'
+    window.location.href = `${successUrl}?token=${token}`
+  }, 1500)
 }
 
 const showError = (errorMessage: string) => {

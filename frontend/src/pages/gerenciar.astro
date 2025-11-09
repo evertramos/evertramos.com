@@ -174,26 +174,14 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </div>
 
-  <script define:vars={{ portalUrl: import.meta.env.CUSTOMER_PORTAL_URL }}>
-    document.getElementById('portalButton').addEventListener('click', async () => {
-      try {
-        const response = await fetch(portalUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        const data = await response.json();
-        
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          alert('Erro ao acessar portal. Tente novamente.');
-        }
-      } catch (error) {
-        console.error('Erro:', error);
-        alert('Erro ao acessar portal. Tente novamente.');
+  <script>
+    document.getElementById('portalButton').addEventListener('click', () => {
+      const portalUrl = import.meta.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL;
+      
+      if (portalUrl && portalUrl !== 'https://billing.stripe.com/p/login/test_your_customer_portal_key_here') {
+        window.location.href = portalUrl;
+      } else {
+        alert('Portal não configurado. Entre em contato com o suporte.');
       }
     });
   </script>

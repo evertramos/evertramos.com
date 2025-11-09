@@ -1,23 +1,9 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import PaymentForm from '../../components/PaymentForm.vue';
+import { translations } from '../../i18n';
 
-const translations = {
-  'payment.title': 'Make Payment',
-  'payment.name': 'Full Name',
-  'payment.email': 'Email',
-  'payment.phone': 'Phone (optional)',
-  'payment.amount': 'Amount',
-  'payment.currency': 'Currency',
-  'payment.type': 'Payment Type',
-  'payment.type.one_time': 'One-time Payment',
-  'payment.type.monthly': 'Monthly',
-  'payment.type.yearly': 'Yearly',
-  'payment.submit': 'Process Payment',
-  'payment.processing': 'Processing...',
-  'success.payment': 'Payment processed successfully!',
-  'error.payment': 'Error processing payment. Please try again.'
-};
+const lang = 'en';
 ---
 
 <Layout title="Evert Ramos|Payment" description="Payment for services rendered or support for open source projects">
@@ -83,7 +69,7 @@ const translations = {
         </div>
       </div>
       
-      <PaymentForm client:load lang="en" translations={translations} />
+      <PaymentForm client:load lang={lang} translations={translations[lang]} />
       
       <!-- Security Notice -->
       <div class="mt-8">

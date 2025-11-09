@@ -7,6 +7,9 @@ class Settings(BaseSettings):
     stripe_publishable_key: str
     stripe_secret_key: str
     
+    # Turnstile Configuration
+    turnstile_secret_key: str
+    
     # Email Configuration
     notification_emails: str  # Comma-separated emails
     smtp_host: str

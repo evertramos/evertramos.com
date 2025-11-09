@@ -8,35 +8,40 @@ export interface Props {
 }
 
 const { title, description = "Secure payment processing with Ezyba" } = Astro.props;
-const lang = getLangFromUrl(Astro.url);
+
+// Simple domain-based language detection
+let lang = 'pt'; // Default to Portuguese
+if (Astro.url.hostname.includes('.com') && !Astro.url.hostname.includes('.com.br')) {
+  lang = 'en'; // .com domain uses English
+} else if (Astro.url.pathname.startsWith('/en')) {
+  lang = 'en'; // URL-based for localhost
+}
+
 const t = useTranslations(lang);
 
-// Function to get the equivalent URL in the other language
-const getAlternateUrl = (currentPath: string, currentLang: string, searchParams: string) => {
-  let newPath = '';
-  
-  if (currentLang === 'pt') {
-    // Portuguese to English
-    if (currentPath === '/') newPath = '/en';
-    else if (currentPath === '/pagamento') newPath = '/en/payment';
-    else if (currentPath === '/privacidade') newPath = '/en/privacy';
-    else if (currentPath === '/termos') newPath = '/en/terms';
-    else if (currentPath === '/admin/gerador') newPath = '/en/admin/generator';
-    else newPath = `/en${currentPath}`;
+// Language switcher URLs for localhost
+let alternateUrl = '#';
+if (Astro.url.hostname.includes('localhost')) {
+  if (lang === 'pt') {
+    // Portuguese to English mappings
+    if (Astro.url.pathname === '/pagamento') alternateUrl = '/en/payment';
+    else if (Astro.url.pathname === '/termos') alternateUrl = '/en/terms';
+    else if (Astro.url.pathname === '/privacidade') alternateUrl = '/en/privacy';
+    else if (Astro.url.pathname === '/sucesso') alternateUrl = '/en/success';
+    else if (Astro.url.pathname === '/gerenciar') alternateUrl = '/en/manage';
+    else if (Astro.url.pathname === '/admin/gerador') alternateUrl = '/en/admin/generator';
+    else alternateUrl = '/en' + Astro.url.pathname;
   } else {
-    // English to Portuguese
-    if (currentPath === '/en' || currentPath === '/en/') newPath = '/';
-    else if (currentPath === '/en/payment') newPath = '/pagamento';
-    else if (currentPath === '/en/privacy') newPath = '/privacidade';
-    else if (currentPath === '/en/terms') newPath = '/termos';
-    else if (currentPath === '/en/admin/generator') newPath = '/admin/gerador';
-    else newPath = currentPath.replace('/en', '') || '/';
+    // English to Portuguese mappings
+    if (Astro.url.pathname === '/en/payment') alternateUrl = '/pagamento';
+    else if (Astro.url.pathname === '/en/terms') alternateUrl = '/termos';
+    else if (Astro.url.pathname === '/en/privacy') alternateUrl = '/privacidade';
+    else if (Astro.url.pathname === '/en/success') alternateUrl = '/sucesso';
+    else if (Astro.url.pathname === '/en/manage') alternateUrl = '/gerenciar';
+    else if (Astro.url.pathname === '/en/admin/generator') alternateUrl = '/admin/gerador';
+    else alternateUrl = Astro.url.pathname.replace('/en', '') || '/';
   }
-  
-  return searchParams ? `${newPath}?${searchParams}` : newPath;
-};
-
-const alternateUrl = getAlternateUrl(Astro.url.pathname, lang, Astro.url.search.slice(1));
+}
 ---
 
 <!DOCTYPE html>
@@ -82,57 +87,52 @@ const alternateUrl = getAlternateUrl(Astro.url.pathname, lang, Astro.url.search.
           });
         }
         
-        // Pass form data via URL parameters when switching language
-        const languageSwitchers = document.querySelectorAll('a[href*="EN"], a[href*="PT"]');
+        // Save form data before language switch
+        const languageSwitchers = document.querySelectorAll('a[href*="/en"], a[href^="/"]');
         languageSwitchers.forEach(link => {
-          link.addEventListener('click', function(e) {
-            const isPaymentPage = window.location.pathname.includes('payment') || window.location.pathname.includes('pagamento');
-            const isGeneratorPage = window.location.pathname.includes('generator') || window.location.pathname.includes('gerador');
-            
-            if (isPaymentPage || isGeneratorPage) {
-              e.preventDefault();
+          if (link.textContent?.includes('EN') || link.textContent?.includes('PT')) {
+            link.addEventListener('click', function(e) {
+              const formData = {
+                name: document.getElementById('name')?.value || '',
+                email: document.getElementById('email')?.value || '',
+                phone: document.getElementById('phone')?.value || '',
+                amount: document.getElementById('amount')?.value || '',
+                currency: document.getElementById('currency')?.value || 'usd',
+                paymentType: (document.getElementById('payment-type') || document.getElementById('paymentType'))?.value || 'one_time'
+              };
               
-              const params = new URLSearchParams();
-              const name = document.getElementById('name')?.value;
-              const email = document.getElementById('email')?.value;
-              const phone = document.getElementById('phone')?.value;
-              const amount = document.getElementById('amount')?.value;
-              const currency = document.getElementById('currency')?.value;
-              const paymentType = (document.getElementById('payment-type') || document.getElementById('paymentType'))?.value;
-              
-              // Add parameters only if they have values
-              if (name) params.append('name', encodeURIComponent(name));
-              if (email) params.append('email', encodeURIComponent(email));
-              if (phone) params.append('phone', encodeURIComponent(phone));
-              if (amount) params.append('amount', amount);
-              if (currency && currency !== 'usd') params.append('currency', currency);
-              if (paymentType && paymentType !== 'one_time') params.append('type', paymentType);
-              
-              // Navigate to new URL with parameters
-              const targetUrl = link.href + (params.toString() ? '?' + params.toString() : '');
-              window.location.href = targetUrl;
-            }
-          });
+              if (formData.name || formData.email || formData.amount) {
+                localStorage.setItem('ezyba_form_data', JSON.stringify(formData));
+              }
+            });
+          }
         });
-      });
-      
-      // Auto-fill form from URL parameters on page load
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('name') || urlParams.has('email') || urlParams.has('amount')) {
-        const nameField = document.getElementById('name');
-        const emailField = document.getElementById('email');
-        const phoneField = document.getElementById('phone');
-        const amountField = document.getElementById('amount');
-        const currencyField = document.getElementById('currency');
-        const typeField = document.getElementById('payment-type') || document.getElementById('paymentType');
         
-        if (nameField && urlParams.get('name')) nameField.value = decodeURIComponent(urlParams.get('name'));
-        if (emailField && urlParams.get('email')) emailField.value = decodeURIComponent(urlParams.get('email'));
-        if (phoneField && urlParams.get('phone')) phoneField.value = decodeURIComponent(urlParams.get('phone'));
-        if (amountField && urlParams.get('amount')) amountField.value = urlParams.get('amount');
-        if (currencyField && urlParams.get('currency')) currencyField.value = urlParams.get('currency');
-        if (typeField && urlParams.get('type')) typeField.value = urlParams.get('type');
-      }
+        // Restore form data on page load
+        setTimeout(() => {
+          const savedFormData = localStorage.getItem('ezyba_form_data');
+          if (savedFormData) {
+            try {
+              const formData = JSON.parse(savedFormData);
+              const nameField = document.getElementById('name');
+              const emailField = document.getElementById('email');
+              const phoneField = document.getElementById('phone');
+              const amountField = document.getElementById('amount');
+              const currencyField = document.getElementById('currency');
+              const typeField = document.getElementById('payment-type') || document.getElementById('paymentType');
+              
+              if (nameField && formData.name) nameField.value = formData.name;
+              if (emailField && formData.email) emailField.value = formData.email;
+              if (phoneField && formData.phone) phoneField.value = formData.phone;
+              if (amountField && formData.amount) amountField.value = formData.amount;
+              if (currencyField && formData.currency) currencyField.value = formData.currency;
+              if (typeField && formData.paymentType) typeField.value = formData.paymentType;
+            } catch (error) {
+              console.warn('Failed to restore form data:', error);
+            }
+          }
+        }, 100);
+      });
     </script>
   </head>
   <body class="min-h-screen bg-gray-50 flex flex-col">
@@ -140,7 +140,7 @@ const alternateUrl = getAlternateUrl(Astro.url.pathname, lang, Astro.url.search.
       <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
-            <a href={lang === 'pt' ? '/' : '/en'} class="flex items-center space-x-3">
+            <a href="/" class="flex items-center space-x-3">
               <img src="/images/logo.jpg" alt="Evert Ramos" class="h-8 w-8" />
               <!-- <span class="text-2xl font-bold text-blue-600">Evert Ramos</span> -->
             </a>

@@ -1,20 +1,20 @@
 # Ezyba - Secure Payment Platform
 
 ## Project Purpose
-Ezyba is a secure payment processing platform designed for maximum security and PCI compliance. It provides a streamlined payment solution that handles sensitive financial data through Stripe integration while maintaining zero data storage on the platform itself.
+Ezyba is a secure payment processing platform designed for maximum security and PCI compliance. It provides a complete payment solution that handles sensitive financial data through Stripe integration while maintaining zero data storage on the platform itself.
 
 ## Value Proposition
-- **Security-First Design**: Zero sensitive data storage with full PCI DSS compliance through Stripe
+- **Security-First Architecture**: Zero sensitive data storage with full PCI DSS compliance through Stripe
 - **Multi-Language Support**: Native Portuguese and English localization
-- **Developer-Friendly**: Clean API design with comprehensive documentation
-- **Production-Ready**: Docker containerization with monitoring and logging
+- **Responsive Design**: Mobile-first approach with comprehensive breakpoint coverage
+- **Production-Ready**: Docker containerization with comprehensive monitoring and logging
 
 ## Key Features
 
 ### Payment Processing
 - One-time payments and recurring subscriptions (monthly/yearly)
-- Multi-currency support (USD, BRL)
-- Stripe Elements integration for secure card input
+- Multi-currency support (BRL/USD)
+- Secure card input via Stripe Elements
 - 3D Secure authentication support
 - Payment confirmation flow with error handling
 
@@ -22,37 +22,42 @@ Ezyba is a secure payment processing platform designed for maximum security and 
 - Content Security Policy (CSP) configured for Stripe
 - XSS protection headers and HTTPS enforcement
 - Input validation with Pydantic models
-- Rate limiting and CORS configuration
+- Rate limiting capabilities
 - Secure environment variable handling
+- No SQL injection vulnerabilities (no database storage)
 
-### Multi-Language Platform
-- Portuguese (default) and English support
-- Localized URLs (/pagamento → /en/payment)
-- Automatic language detection and switching
-- SEO-optimized with hreflang tags
-
-### Administrative Tools
-- Payment link generator for easy customer onboarding
+### User Experience
+- Mobile-first responsive design (320px to 1440px breakpoints)
+- Intuitive payment forms with real-time validation
 - Customer portal for subscription management
-- Email notifications for payment events
-- Comprehensive logging and monitoring
+- Automatic email notifications for payment events
+- Form persistence across sessions
+
+### Administrative Features
+- Comprehensive logging system with structured events
+- Email notifications to admin team
+- Payment monitoring and error tracking
+- Security event logging
+- Docker-based deployment with health checks
 
 ## Target Users
 
 ### Primary Users
-- **Business Owners**: Need secure payment processing for their services
-- **Freelancers**: Require professional payment collection tools
-- **Service Providers**: Want recurring billing capabilities
+- **Customers**: Individuals making payments or setting up subscriptions
+- **Business Owners**: Companies needing secure payment processing
+- **Administrators**: Team members managing payment operations
 
 ### Use Cases
-- **Service Billing**: Monthly/yearly subscription management
-- **One-time Payments**: Project payments, consultations, products
-- **International Business**: Multi-currency and multi-language support
-- **Compliance Requirements**: Businesses needing PCI DSS compliance
+- **E-commerce Payments**: Secure checkout for online stores
+- **Subscription Services**: Recurring billing for SaaS or services
+- **Donation Processing**: Secure donation collection
+- **Service Payments**: Professional service billing
+- **International Transactions**: Multi-currency payment processing
 
-## Technical Advantages
-- **Zero Database**: No sensitive data storage reduces security risks
-- **Stripe Integration**: Leverages industry-leading payment infrastructure
-- **Modern Stack**: Astro frontend with FastAPI backend
-- **Container-Ready**: Docker deployment with development/production configs
-- **Test Coverage**: Comprehensive testing suite with >80% coverage requirement
+## Technical Capabilities
+- **Frontend**: Astro with TypeScript and Vue components
+- **Backend**: FastAPI with Python type hints and Pydantic validation
+- **Payments**: Stripe Payment Intents and Subscriptions API
+- **Deployment**: Docker Compose with production and development configurations
+- **Monitoring**: Structured logging with multiple log levels and file separation
+- **Testing**: Comprehensive test coverage for both frontend and backend

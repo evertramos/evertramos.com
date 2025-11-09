@@ -1,228 +1,276 @@
-# Development Guidelines - Ezyba
+# Development Guidelines and Patterns
 
 ## Code Quality Standards
 
-### Type Safety (100% Coverage)
-- **ALWAYS** use type hints on all function parameters and return types
-- **ALWAYS** use Pydantic models for data validation and serialization
-- **ALWAYS** use Enum classes for constants (Currency, PaymentType)
-- **ALWAYS** use Optional[] for nullable fields
-- **ALWAYS** use Literal types for restricted string values
+### Python Backend Standards
+- **Type Hints**: MANDATORY on all functions, parameters, and return values
+- **Async/Await**: Use async functions for all I/O operations (database, API calls, email)
+- **Pydantic Models**: All data validation through Pydantic with custom validators
+- **Logging**: Structured logging with request IDs for traceability
+- **Error Handling**: Try-catch blocks with specific exception types and proper logging
 
-### Input Validation Patterns
-- **ALWAYS** use Pydantic Field() with constraints (min_length, max_length, gt, pattern)
-- **ALWAYS** implement custom validators with @validator decorator
-- **ALWAYS** validate email formats with EmailStr type
-- **ALWAYS** sanitize user inputs (email subjects, phone numbers)
-- **ALWAYS** use regex patterns for phone and URL validation
+### TypeScript Frontend Standards
+- **Type Safety**: Explicit types for all variables, functions, and interfaces
+- **Export Patterns**: Named exports for utilities, default exports for components
+- **Const Assertions**: Use `as const` for immutable data structures
+- **Function Types**: Arrow functions for utilities, regular functions for components
 
-### Error Handling Standards
-- **ALWAYS** use structured logging with request IDs (uuid4()[:8])
-- **ALWAYS** catch specific exceptions before generic Exception
-- **ALWAYS** re-raise HTTPException for API errors
-- **ALWAYS** log errors with context using log_error() utility
-- **ALWAYS** return user-friendly error messages, never expose internals
+## Structural Conventions
 
-## Security Implementation Patterns
-
-### Authentication & Authorization
-- **ALWAYS** use HTTPBearer for API key authentication
-- **ALWAYS** implement custom __call__ method for auth classes
-- **ALWAYS** verify credentials in middleware before processing
-- **ALWAYS** log security events (invalid keys, rate limits)
-- **ALWAYS** use environment variables for sensitive configuration
-
-### Rate Limiting Implementation
-- **ALWAYS** implement per-IP rate limiting with time windows
-- **ALWAYS** clean expired entries from rate limit storage
-- **ALWAYS** skip rate limiting for health check endpoints
-- **ALWAYS** return 429 status for rate limit violations
-- **ALWAYS** log rate limit violations with IP addresses
-
-### Security Headers Pattern
-```python
-response.headers["X-Content-Type-Options"] = "nosniff"
-response.headers["X-Frame-Options"] = "DENY"
-response.headers["X-XSS-Protection"] = "1; mode=block"
-response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+### File Organization Pattern
+```
+app/
+├── models/          # Pydantic models with validation
+├── routers/         # FastAPI route handlers
+├── services/        # Business logic classes
+├── middleware/      # Security and request processing
+└── utils/           # Pure utility functions
 ```
 
-## Service Layer Architecture
+### Import Organization (Python)
+1. Standard library imports
+2. Third-party imports (FastAPI, Pydantic, etc.)
+3. Local app imports (models, services, utils)
+4. Blank lines between groups
+
+### Import Organization (TypeScript)
+1. External libraries
+2. Internal utilities and types
+3. Component imports
+4. Relative imports last
+
+## Naming Conventions
+
+### Python Naming
+- **Functions**: `snake_case` with descriptive verbs (`create_payment`, `send_email`)
+- **Classes**: `PascalCase` with descriptive nouns (`EmailService`, `PaymentRequest`)
+- **Constants**: `UPPER_SNAKE_CASE` (`STRIPE_SECRET_KEY`, `DEFAULT_CURRENCY`)
+- **Variables**: `snake_case` with meaningful names (`request_id`, `customer_result`)
+
+### TypeScript Naming
+- **Functions**: `camelCase` with descriptive verbs (`getLangFromUrl`, `useTranslations`)
+- **Interfaces**: `PascalCase` with descriptive nouns (`PaymentData`, `TranslationKey`)
+- **Constants**: `UPPER_SNAKE_CASE` or `camelCase` for objects (`languages`, `defaultLang`)
+- **Variables**: `camelCase` with meaningful names (`clientSecret`, `paymentIntent`)
+
+## Documentation Standards
+
+### Function Documentation (Python)
+```python
+async def create_payment(
+    payment_request: PaymentRequest,
+    stripe_service: StripeService = Depends(get_stripe_service)
+) -> PaymentResponse:
+    """Create a payment (one-time or subscription)"""
+```
+
+### Function Documentation (TypeScript)
+```typescript
+export function getLangFromUrl(url: URL) {
+  // Extract language from URL path
+  const [, lang] = url.pathname.split('/');
+  if (lang in languages) return lang as keyof typeof languages;
+  return defaultLang;
+}
+```
+
+## Security Patterns
+
+### Input Validation Pattern
+- **Backend**: Pydantic models with custom validators for all inputs
+- **Frontend**: Client-side validation + server-side confirmation
+- **Email Validation**: Regex pattern + length checks + header injection prevention
+- **Amount Validation**: Minimum thresholds + integer conversion (cents)
+
+### Error Handling Pattern
+```python
+try:
+    # Business logic
+    result = await service.process()
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+except HTTPException:
+    raise  # Re-raise HTTP exceptions
+except Exception as e:
+    log_error(request_id, e, "Context description")
+    raise HTTPException(status_code=500, detail="Internal server error")
+```
+
+### Logging Pattern
+```python
+request_id = str(uuid.uuid4())[:8]
+logger.info(f"[{request_id}] Processing request for {user_email}")
+log_payment_attempt(request_id, email, amount, currency, success)
+```
+
+## API Design Patterns
 
 ### Dependency Injection Pattern
-- **ALWAYS** use FastAPI Depends() for service injection
-- **ALWAYS** create factory functions (get_stripe_service, get_email_service)
-- **ALWAYS** inject services into route handlers, not instantiate directly
-- **ALWAYS** use constructor injection for service dependencies
-
-### Service Class Structure
-- **ALWAYS** initialize service configuration in __init__
-- **ALWAYS** use private methods (_validate_email, _sanitize_subject) for internal logic
-- **ALWAYS** return structured dictionaries with "success" and "error" keys
-- **ALWAYS** implement async methods for I/O operations
-- **ALWAYS** validate inputs at service layer before external API calls
-
-### Email Service Patterns
-- **ALWAYS** validate email addresses before sending
-- **ALWAYS** sanitize email subjects to prevent header injection
-- **ALWAYS** use Jinja2 templates for HTML email content
-- **ALWAYS** send both customer and admin notifications
-- **ALWAYS** handle SMTP configuration differences (dev vs prod)
-
-## API Design Standards
-
-### Route Handler Structure
 ```python
-@router.post("/endpoint", response_model=ResponseModel)
-async def handler_name(
-    request_model: RequestModel,
-    credentials: HTTPAuthorizationCredentials = Depends(api_key_auth),
-    service: ServiceClass = Depends(get_service)
-) -> ResponseModel:
+def get_stripe_service() -> StripeService:
+    return StripeService()
+
+@router.post("/create")
+async def create_payment(
+    payment_request: PaymentRequest,
+    stripe_service: StripeService = Depends(get_stripe_service)
+):
 ```
 
-### Request Processing Pattern
-1. **Generate request ID** for tracking
-2. **Log request start** with user identifier
-3. **Process business logic** through service layer
-4. **Send notifications** (email, webhooks)
-5. **Log success/failure** with request ID
-6. **Return structured response**
-
-### Error Response Pattern
-- **ALWAYS** catch HTTPException and re-raise
-- **ALWAYS** catch generic Exception and log with request ID
-- **ALWAYS** send failure notifications when appropriate
-- **ALWAYS** return 500 status for unexpected errors
-- **ALWAYS** use generic error messages for security
-
-## Configuration Management
-
-### Settings Pattern
-- **ALWAYS** use Pydantic BaseSettings for configuration
-- **ALWAYS** load from environment variables
-- **ALWAYS** provide sensible defaults for development
-- **ALWAYS** validate configuration on startup
-- **ALWAYS** separate development and production configs
-
-### Environment Variable Naming
-- **ALWAYS** use UPPER_CASE for environment variables
-- **ALWAYS** prefix with service name (STRIPE_, SMTP_)
-- **ALWAYS** use descriptive names (NOTIFICATION_EMAILS vs EMAILS)
-- **ALWAYS** document required vs optional variables
-
-## Logging Standards
-
-### Structured Logging Pattern
+### Response Model Pattern
 ```python
-logger.info(f"[{request_id}] Processing payment request for {email}")
-log_payment_attempt(request_id, email, amount, currency, success)
-log_error(request_id, exception, context_description)
-log_security_event(event_type, client_ip, details)
+@router.post("/create", response_model=PaymentResponse)
+async def create_payment(...) -> PaymentResponse:
+    return PaymentResponse(
+        success=True,
+        payment_id=payment_intent.id,
+        client_secret=client_secret,
+        message="Payment intent created successfully"
+    )
 ```
 
-### Log Message Format
-- **ALWAYS** include request ID in brackets [req_id]
-- **ALWAYS** include user identifier (email, IP)
-- **ALWAYS** log both start and completion of operations
-- **ALWAYS** use appropriate log levels (INFO, WARNING, ERROR)
-- **ALWAYS** include relevant context in error logs
+### Service Layer Pattern
+```python
+class EmailService:
+    def __init__(self):
+        self.smtp_host = settings.smtp_host
+        self.smtp_port = settings.smtp_port
+    
+    async def send_email(self, to_emails: List[str], subject: str, html_content: str):
+        # Implementation with validation and error handling
+```
 
 ## Testing Patterns
 
-### Test Structure (Inferred from imports)
-- **ALWAYS** use pytest for test framework
-- **ALWAYS** use pytest-asyncio for async test support
-- **ALWAYS** use httpx for HTTP client testing
-- **ALWAYS** organize tests by module (models/, routers/, services/)
-- **ALWAYS** mock external services (Stripe, SMTP)
+### Test Organization
+- **Test Classes**: Group related tests (`TestPayments`, `TestPaymentModels`)
+- **Mock Pattern**: Use `@patch` decorators for external service mocking
+- **Test Data**: Realistic test data with edge cases
+- **Assertions**: Specific assertions for each test case
 
-## FastAPI Application Patterns
+### Mock Pattern Example
+```python
+@patch('app.services.stripe_service.StripeService.create_customer')
+@patch('app.services.email_service.EmailService.send_payment_confirmation')
+def test_create_payment_success(self, mock_email, mock_customer):
+    mock_customer.return_value = {"success": True, "customer": mock_object}
+    # Test implementation
+```
 
-### Application Lifecycle
-- **ALWAYS** use @asynccontextmanager for lifespan events
-- **ALWAYS** configure external services on startup
-- **ALWAYS** log application start/stop events
-- **ALWAYS** set up global exception handlers
+## Internationalization Patterns
 
-### Middleware Order (Critical)
-1. **TrustedHostMiddleware** - Host validation
-2. **CORSMiddleware** - Cross-origin requests
-3. **rate_limit_middleware** - Rate limiting
-4. **security_headers_middleware** - Security headers
+### Translation Key Structure
+```typescript
+export const translations = {
+  pt: {
+    'section.key': 'Valor em Português',
+    'validation.field_required': 'Campo obrigatório'
+  },
+  en: {
+    'section.key': 'English Value',
+    'validation.field_required': 'Field required'
+  }
+};
+```
 
-### Router Organization
-- **ALWAYS** use APIRouter with prefix and tags
-- **ALWAYS** group related endpoints in same router
-- **ALWAYS** include routers with versioned prefix (/api/v1)
-- **ALWAYS** implement health check endpoint
+### Translation Usage Pattern
+```typescript
+export function useTranslations(lang: keyof typeof translations) {
+  return function t(key: keyof typeof translations[typeof defaultLang]) {
+    return translations[lang][key] || translations[defaultLang][key];
+  }
+}
+```
 
-## Data Model Patterns
+## Configuration Patterns
 
-### Pydantic Model Structure
-- **ALWAYS** inherit from BaseModel
-- **ALWAYS** use Field() for validation constraints
-- **ALWAYS** implement custom validators for complex logic
-- **ALWAYS** use descriptive field names and docstrings
-- **ALWAYS** group related fields with comments
+### Environment Configuration
+```python
+class Settings(BaseSettings):
+    stripe_secret_key: str
+    stripe_publishable_key: str
+    environment: str = "development"
+    
+    @property
+    def notification_email_list(self) -> List[str]:
+        return [email.strip() for email in self.notification_emails.split(',')]
+```
 
-### Validation Patterns
-- **ALWAYS** validate minimum values for financial amounts
-- **ALWAYS** check currency-specific requirements
-- **ALWAYS** validate phone number formats and lengths
-- **ALWAYS** use regex patterns for format validation
-- **ALWAYS** provide clear error messages in validators
+### Frontend Configuration
+```javascript
+export default defineConfig({
+  integrations: [tailwind(), vue()],
+  i18n: {
+    defaultLocale: "pt",
+    locales: ["pt", "en"],
+    routing: { prefixDefaultLocale: false }
+  }
+});
+```
 
 ## Common Code Idioms
 
 ### Request ID Generation
 ```python
-request_id = str(uuid.uuid4())[:8]
+request_id = str(uuid.uuid4())[:8]  # Short unique identifier
 ```
 
-### Service Result Pattern
+### Amount Formatting
 ```python
-result = await service.method()
-if result["success"]:
-    # Handle success
-else:
-    raise HTTPException(status_code=400, detail=result["error"])
+amount_display = f"${amount / 100:.2f}" if currency == "usd" else f"R${amount / 100:.2f}"
 ```
 
-### Email Template Pattern
+### Email Validation
 ```python
-template = Template("""HTML template with {{ variables }}""")
-html_content = template.render(variable=value)
+def _validate_email(self, email: str) -> bool:
+    if not email or len(email) > 254:
+        return False
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return bool(re.match(pattern, email))
 ```
 
-### Rate Limiting Cleanup
+### Template Rendering
 ```python
-rate_limit_storage[client_ip] = {
-    timestamp: count for timestamp, count in rate_limit_storage[client_ip].items()
-    if int(timestamp) > window_start
-}
+template = Template(html_content)
+rendered_html = template.render(
+    success=success,
+    name=payment_request.name,
+    amount_display=amount_display
+)
 ```
 
 ## Frequently Used Annotations
 
-### FastAPI Decorators
-- `@router.post("/path", response_model=Model)` - API endpoints
-- `@validator('field')` - Pydantic field validation
-- `@asynccontextmanager` - Application lifespan management
+### Python Annotations
+- `@router.post("/endpoint", response_model=ResponseModel)`
+- `@patch('module.Class.method')` for testing
+- `async def function_name(...) -> ReturnType:`
+- `field: str = Field(..., min_length=2, max_length=100)`
 
-### Type Annotations
-- `Optional[str]` - Nullable string fields
-- `List[str]` - String arrays
-- `Dict[str, Any]` - Generic dictionaries
-- `HTTPAuthorizationCredentials` - API authentication
-- `Depends(factory_function)` - Dependency injection
+### TypeScript Annotations
+- `export const languages = {...} as const;`
+- `function t(key: keyof typeof translations[typeof defaultLang])`
+- `lang as keyof typeof languages`
+- `url: URL` for function parameters
 
-### Common Imports Pattern
+## Security Implementation Patterns
+
+### Header Sanitization
 ```python
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel, Field, validator
-from typing import Optional, Dict, Any, List
-import logging
-import uuid
+def _sanitize_subject(self, subject: str) -> str:
+    return re.sub(r'[\r\n]', '', subject)[:200]
 ```
+
+### Middleware Pattern
+```python
+app.middleware("http")(rate_limit_middleware)
+app.middleware("http")(security_headers_middleware)
+```
+
+### Authentication Dependency
+```python
+credentials: HTTPAuthorizationCredentials = Depends(api_key_auth)
+```
+
+These patterns are consistently applied across the codebase and should be followed for all new development to maintain code quality, security, and maintainability standards.

@@ -1,0 +1,94 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { translations } from '../../i18n';
+import { getContextualEmail } from '../../utils/emailUtils';
+
+const lang = 'en';
+const t = (key: string) => translations[lang][key] || key;
+const financialEmail = getContextualEmail('FINANCIAL');
+---
+
+<script>
+  // Protect success page from direct access
+  import { shouldRedirectFromSuccess, consumeSuccessToken } from '../../utils/successToken';
+  
+  // Check if user should be on this page
+  if (shouldRedirectFromSuccess()) {
+    // Redirect to payment page if no valid token
+    window.location.href = '/en/payment';
+  } else {
+    // Consume token to prevent reuse
+    consumeSuccessToken();
+  }
+</script>
+
+<Layout title="Payment Successful" description="Your payment has been processed successfully">
+  <script>
+    // Client-side protection as backup
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      
+      // If no token in URL, redirect
+      if (!token) {
+        setTimeout(() => {
+          window.location.href = '/en/payment';
+        }, 100);
+      }
+    });
+  </script>
+  <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full">
+      <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+        <!-- Success Icon -->
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        
+        <!-- Success Message -->
+        <h1 class="text-2xl font-bold text-gray-900 mb-4">
+          Payment Successful!
+        </h1>
+        
+        <p class="text-gray-600 mb-6">
+          Your payment has been processed successfully. You will receive a confirmation email shortly.
+        </p>
+        
+        <!-- Payment Details -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+          <h3 class="font-semibold text-gray-900 mb-2">Next steps:</h3>
+          <ul class="text-sm text-gray-600 space-y-1">
+            <li>• Confirmation sent via email</li>
+            <li>• Receipt available in customer portal</li>
+            <li>• Support via email if needed</li>
+          </ul>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+          <a href="/en/manage" 
+             class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors inline-block">
+            Manage Payments
+          </a>
+          
+          <a href="/en" 
+             class="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors inline-block">
+            Back to Home
+          </a>
+        </div>
+        
+        <!-- Contact Info -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <p class="text-xs text-gray-500">
+            Payment questions? Contact: 
+            <span class="text-blue-600 cursor-pointer hover:underline" onclick={financialEmail.onclick}>
+              {financialEmail.display}
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

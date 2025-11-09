@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials
 import logging
 from typing import Dict, Any
@@ -12,6 +12,7 @@ from app.models.payment import (
 )
 from app.services.stripe_service import StripeService
 from app.services.email_service import EmailService
+from app.services.turnstile_service import TurnstileService
 from app.middleware.security import APIKeyAuth
 from app.utils.logging import log_payment_attempt, log_error
 import uuid
@@ -29,12 +30,18 @@ def get_email_service() -> EmailService:
     return EmailService()
 
 
+def get_turnstile_service() -> TurnstileService:
+    return TurnstileService()
+
+
 @router.post("/create", response_model=PaymentResponse)
 async def create_payment(
     payment_request: PaymentRequest,
+    request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(api_key_auth),
     stripe_service: StripeService = Depends(get_stripe_service),
-    email_service: EmailService = Depends(get_email_service)
+    email_service: EmailService = Depends(get_email_service),
+    turnstile_service: TurnstileService = Depends(get_turnstile_service)
 ) -> PaymentResponse:
     """Create a payment (one-time or subscription)"""
     
@@ -42,6 +49,19 @@ async def create_payment(
     
     try:
         logger.info(f"[{request_id}] Processing payment request for {payment_request.email}")
+        
+        # Verify Turnstile token first
+        client_ip = request.client.host if request.client else None
+        turnstile_result = await turnstile_service.verify_token(
+            payment_request.turnstile_token, 
+            client_ip
+        )
+        
+        if not turnstile_result["success"]:
+            logger.warning(f"[{request_id}] Turnstile verification failed: {turnstile_result.get('error')}")
+            raise HTTPException(status_code=400, detail="Security verification failed")
+        
+        logger.info(f"[{request_id}] Turnstile verification successful")
         log_payment_attempt(request_id, payment_request.email, payment_request.amount, payment_request.currency.value, False)
         
         # Create or get customer

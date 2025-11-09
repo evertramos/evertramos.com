@@ -1,166 +1,202 @@
-# Technology Stack - Ezyba
+# Technology Stack and Development
 
-## Programming Languages
-- **TypeScript**: Frontend development with type safety
-- **Python 3.11+**: Backend API development
-- **JavaScript**: Client-side interactivity
-- **HTML/CSS**: Markup and styling
+## Programming Languages and Versions
 
-## Frontend Stack
+### Frontend
+- **TypeScript**: ^5.6.3 - Type-safe JavaScript with modern ES features
+- **JavaScript**: ES2022+ - Modern JavaScript features and syntax
+- **CSS**: CSS3 with Tailwind utility classes
+- **HTML**: HTML5 with Astro templating
 
-### Core Framework
-- **Astro 4.16.12**: Static site generator with component islands
-- **Vue 3.4.38**: Interactive components for payment forms
-- **TypeScript 5.6.3**: Type-safe development
+### Backend
+- **Python**: 3.11+ - Modern Python with type hints and async support
+- **SQL**: None (zero database storage for security)
 
-### Styling & UI
-- **Tailwind CSS 3.4.14**: Utility-first CSS framework
-- **Responsive Design**: Mobile-first approach (320px, 768px, 1024px, 1440px)
+## Core Frameworks and Libraries
 
-### Payment Integration
-- **@stripe/stripe-js 4.8.0**: Stripe Elements for secure payment forms
-- **Stripe Elements**: PCI-compliant card input components
+### Frontend Stack
+- **Astro**: ^4.16.12 - Static site generator with island architecture
+- **Vue**: ^3.4.38 - Progressive JavaScript framework for components
+- **Tailwind CSS**: ^3.4.14 - Utility-first CSS framework
+- **Stripe.js**: ^4.8.0 - Official Stripe JavaScript library
 
-### Build Tools
-- **Vite**: Fast build tool (via Astro)
-- **Node.js**: Runtime environment
-- **npm**: Package management
+### Backend Stack
+- **FastAPI**: 0.115.4 - Modern Python web framework
+- **Uvicorn**: 0.32.0 - ASGI server with standard extras
+- **Pydantic**: 2.9.2 - Data validation using Python type annotations
+- **Stripe Python**: 11.2.0 - Official Stripe Python library
 
-## Backend Stack
+## Build Systems and Tools
 
-### Core Framework
-- **FastAPI 0.115.4**: Modern Python web framework
-- **Uvicorn 0.32.0**: ASGI server with standard extras
-- **Pydantic 2.9.2**: Data validation and settings management
+### Frontend Build System
+- **Astro Build**: Static site generation with optimized output
+- **Vite**: Fast build tool and development server
+- **TypeScript Compiler**: Type checking and compilation
+- **Tailwind CLI**: CSS processing and optimization
 
-### Payment Processing
-- **Stripe 11.2.0**: Payment processing SDK
-- **Webhook Validation**: Secure event handling
-
-### Email & Communication
-- **aiosmtplib 3.0.2**: Async SMTP client
-- **Jinja2 3.1.4**: Email template engine
-- **email-validator 2.2.0**: Email format validation
-
-### Development & Testing
-- **pytest 8.3.3**: Testing framework
-- **pytest-asyncio 0.24.0**: Async test support
-- **httpx 0.27.2**: HTTP client for testing
-- **python-multipart 0.0.12**: Form data handling
-
-## Infrastructure & Deployment
+### Backend Build System
+- **Python Package Management**: pip with requirements.txt
+- **FastAPI**: Built-in OpenAPI documentation generation
+- **Uvicorn**: Production ASGI server
 
 ### Containerization
-- **Docker**: Application containerization
-- **Docker Compose**: Multi-service orchestration
-- **Nginx**: Reverse proxy and static file serving
+- **Docker**: Multi-stage builds for optimized images
+- **Docker Compose**: Service orchestration and networking
+- **Nginx**: Reverse proxy and static file serving (frontend)
 
-### Development Environment
-- **Hot Reload**: Automatic code reloading
-- **Mailpit**: Email testing interface
-- **Volume Mounting**: Live code updates
+## Development Dependencies and Tools
 
-### Production Environment
-- **AWS SES**: Email delivery service
-- **HTTPS**: SSL/TLS encryption
-- **Environment Variables**: Secure configuration
+### Frontend Development
+```json
+{
+  "@types/node": "^22.8.7",
+  "astro": "^4.16.12",
+  "typescript": "^5.6.3"
+}
+```
+
+### Backend Development
+```txt
+pytest==8.3.3
+pytest-asyncio==0.24.0
+httpx==0.27.2
+```
+
+### Additional Services
+- **Email**: aiosmtplib 3.0.2 with Jinja2 3.1.4 templating
+- **Validation**: email-validator 2.2.0
+- **HTTP Client**: httpx 0.27.2 for external API calls
 
 ## Development Commands
 
-### Frontend Development
+### Frontend Commands
 ```bash
-# Install dependencies
-npm install
-
-# Start development server
+# Development server
 npm run dev
 
-# Build for production
+# Production build
 npm run build
 
 # Preview production build
 npm run preview
+
+# Start development (alias)
+npm start
 ```
 
-### Backend Development
+### Backend Commands
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Start development server
+# Development server
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# Production server
+uvicorn main:app --host 0.0.0.0 --port 8000
 
 # Run tests
 python -m pytest tests/ -v --cov=app
 
-# Run specific test
+# Run specific test file
 python -m pytest tests/test_payments.py -v
 ```
 
-### Docker Development
+### Docker Commands
 ```bash
-# Start development environment
+# Development environment
 docker compose -f docker-compose.dev.yml up --build
 
-# Start production environment
+# Production environment
 docker compose up -d --build
 
 # View logs
 docker compose logs -f
 
-# Stop services
-docker compose down
+# Restart services
+docker compose restart
 ```
-
-## Build System
-
-### Frontend Build Process
-1. **TypeScript Compilation**: Type checking and transpilation
-2. **Astro Build**: Static site generation with component islands
-3. **Tailwind Processing**: CSS utility compilation
-4. **Asset Optimization**: Image and resource optimization
-
-### Backend Build Process
-1. **Dependency Installation**: Python package management
-2. **FastAPI Application**: ASGI application setup
-3. **Environment Configuration**: Settings validation
-4. **Container Packaging**: Docker image creation
 
 ## Configuration Management
 
 ### Environment Variables
-- **STRIPE_PUBLISHABLE_KEY**: Frontend Stripe configuration
-- **STRIPE_SECRET_KEY**: Backend Stripe API access
-- **SMTP_***: Email service configuration
-- **ENVIRONMENT**: Development/production mode
+```bash
+# Stripe Configuration
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
 
-### Configuration Files
-- **astro.config.mjs**: Astro framework settings
-- **tailwind.config.mjs**: CSS framework customization
-- **config.py**: Python application settings
-- **docker-compose.yml**: Service orchestration
+# Email Configuration
+NOTIFICATION_EMAILS=admin@ezyba.com
+SMTP_HOST=mailpit
+SMTP_PORT=1025
 
-## Security Technologies
+# Security
+TURNSTILE_SECRET_KEY=...
+PUBLIC_TURNSTILE_SITE_KEY=...
 
-### Frontend Security
-- **Content Security Policy**: XSS protection
-- **HTTPS Enforcement**: Secure communication
-- **Stripe Elements**: PCI-compliant payment forms
+# Environment
+ENVIRONMENT=development|production
+```
 
-### Backend Security
-- **Pydantic Validation**: Input sanitization
-- **Type Hints**: Runtime type checking
-- **CORS Configuration**: Cross-origin request control
-- **Rate Limiting**: API abuse prevention
+### Astro Configuration
+```javascript
+// astro.config.mjs
+export default defineConfig({
+  integrations: [tailwind(), vue()],
+  i18n: {
+    defaultLocale: "pt",
+    locales: ["pt", "en"],
+    routing: { prefixDefaultLocale: false }
+  },
+  server: { host: '0.0.0.0', port: 3000 }
+});
+```
 
-## Monitoring & Logging
+### FastAPI Configuration
+```python
+# config.py
+class Settings(BaseSettings):
+    stripe_secret_key: str
+    stripe_publishable_key: str
+    notification_emails: str
+    environment: str = "development"
+```
 
-### Logging Framework
-- **Python Logging**: Structured application logs
-- **Request Tracking**: Unique request IDs
-- **Error Handling**: Comprehensive error logging
+## Testing Framework
 
-### Development Tools
-- **FastAPI Docs**: Automatic API documentation
-- **Pytest Coverage**: Code coverage reporting
-- **Docker Logs**: Container log aggregation
+### Frontend Testing
+- **Framework**: Built-in Astro testing capabilities
+- **Type Checking**: TypeScript compiler validation
+- **Linting**: ESLint configuration (implicit)
+
+### Backend Testing
+- **Framework**: pytest with asyncio support
+- **Coverage**: pytest-cov for coverage reporting
+- **HTTP Testing**: httpx for API endpoint testing
+- **Mocking**: Built-in unittest.mock for external services
+
+### Test Structure
+```
+tests/
+├── models/          # Pydantic model tests
+├── routers/         # API endpoint tests
+├── services/        # Business logic tests
+└── utils/           # Utility function tests
+```
+
+## Deployment Technology
+
+### Container Technology
+- **Base Images**: Python 3.11-slim, Node 18-alpine
+- **Multi-stage Builds**: Optimized production images
+- **Health Checks**: Built-in container health monitoring
+- **Volume Mounting**: Log persistence and data management
+
+### Networking
+- **Docker Networks**: Isolated service communication
+- **Port Mapping**: 3000 (frontend), 8000 (backend)
+- **Reverse Proxy**: Nginx for frontend static serving
+- **CORS**: Configured for cross-origin requests
+
+### Monitoring and Logging
+- **Structured Logging**: JSON format with multiple levels
+- **Log Rotation**: File-based logging with external volumes
+- **Health Endpoints**: /health for service monitoring
+- **Error Tracking**: Comprehensive error logging and reporting
