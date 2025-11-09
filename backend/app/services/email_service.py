@@ -6,6 +6,7 @@ from typing import List
 from jinja2 import Template
 from email.utils import parseaddr
 import re
+import html
 
 from app.config import settings
 from app.models.payment import PaymentRequest, PaymentType
@@ -126,7 +127,7 @@ class EmailService:
         
         customer_html = customer_template.render(
             success=success,
-            name=payment_request.name,
+            name=html.escape(payment_request.name),
             amount_display=amount_display,
             payment_type_display=payment_type_display,
             payment_id=payment_id
@@ -165,9 +166,9 @@ class EmailService:
         
         admin_html = admin_template.render(
             success=success,
-            name=payment_request.name,
-            email=payment_request.email,
-            phone=payment_request.phone,
+            name=html.escape(payment_request.name),
+            email=html.escape(payment_request.email),
+            phone=html.escape(payment_request.phone) if payment_request.phone else None,
             amount_display=amount_display,
             currency=payment_request.currency.value.upper(),
             payment_type_display=payment_type_display,

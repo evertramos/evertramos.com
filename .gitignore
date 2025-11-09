@@ -166,3 +166,5 @@ uploads/
 # Resume
 ./docs/evert-ramos-cv.md
 
+# API keys
+api-key-backup.txt

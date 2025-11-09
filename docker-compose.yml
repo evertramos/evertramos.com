@@ -1,31 +1,37 @@
 services:
-  frontend:
+  evertramos-site:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: ezyba-frontend
-    ports:
-      - "3000:3000"
+    container_name: evertramos-frontend
+    expose:
+      - "3000"
     environment:
       - NODE_ENV=production
-      - BACKEND_URL=http://backend:8000
+      - PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL}
       - PUBLIC_TURNSTILE_SITE_KEY=${PUBLIC_TURNSTILE_SITE_KEY}
+      - PUBLIC_API_KEY=${PUBLIC_API_KEY}
       - STRIPE_CUSTOMER_PORTAL_URL=${STRIPE_CUSTOMER_PORTAL_URL}
+      - VIRTUAL_HOST=evertramos.com,evertramos.com.br
+      - VIRTUAL_PORT=3000
+      - LETSENCRYPT_HOST=evertramos.com,evertramos.com.br
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
     networks:
-      - ezyba-network
+      - proxy
     restart: unless-stopped
 
-  backend:
+  evertramos-backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: ezyba-backend
-    ports:
-      - "8000:8000"
+    container_name: evertramos-backend
+    expose:
+      - "8000"
     volumes:
       - ../data/logs:/tmp/logs
     environment:
       - ENVIRONMENT=production
+      - API_KEY=${API_KEY}
       - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - NOTIFICATION_EMAILS=${NOTIFICATION_EMAILS}
@@ -34,12 +40,18 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - VIRTUAL_HOST=pay.evertramos.com
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=pay.evertramos.com
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
     env_file:
       - .env
     networks:
-      - ezyba-network
+      - proxy
     restart: unless-stopped
 
 networks:
-  ezyba-network:
-    driver: bridge
+  proxy:
+    external: true

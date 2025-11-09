@@ -36,12 +36,12 @@ app = FastAPI(
 # Security Middleware
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["pay.ezyba.com", "localhost", "127.0.0.1"]
+    allowed_hosts=settings.allowed_hosts_list + ["127.0.0.1"]
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],

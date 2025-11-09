@@ -18,25 +18,30 @@ class Settings(BaseSettings):
     smtp_password: str
     
     # Application Configuration
-    environment: str = "development"
+    environment: str  # Required - development/production
     api_title: str = "Ezyba Payment API"
     api_version: str = "1.0.0"
     
     # Security
-    cors_origins: List[str] = [
-        "https://evertramos.com",
-        "https://evertramos.com.br",
-        "http://localhost:3000"
-    ]
+    cors_origins: str  # Required - comma-separated origins
+    allowed_hosts: str  # Required - comma-separated hosts
     
     # API Security
-    api_key: str = "ezyba-secure-api-key-2024"
+    api_key: str  # Required - generate with scripts/generate-api-key.py
     rate_limit_requests: int = 100
     rate_limit_window: int = 3600  # 1 hour
     
     @property
     def notification_email_list(self) -> List[str]:
         return [email.strip() for email in self.notification_emails.split(",")]
+    
+    @property
+    def cors_origins_list(self) -> List[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",")]
+    
+    @property
+    def allowed_hosts_list(self) -> List[str]:
+        return [host.strip() for host in self.allowed_hosts.split(",")]
     
     class Config:
         env_file = ".env"

@@ -21,8 +21,9 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - PUBLIC_BACKEND_URL=http://localhost:8000
+      - PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL:-http://localhost:8000}
       - PUBLIC_TURNSTILE_SITE_KEY=${PUBLIC_TURNSTILE_SITE_KEY}
+      - PUBLIC_API_KEY=${PUBLIC_API_KEY}
       - PUBLIC_FINANCIAL_EMAIL=${PUBLIC_FINANCIAL_EMAIL}
       - PUBLIC_LEGAL_EMAIL=${PUBLIC_LEGAL_EMAIL}
       - PUBLIC_STRIPE_CUSTOMER_PORTAL_URL=${PUBLIC_STRIPE_CUSTOMER_PORTAL_URL}
@@ -42,6 +43,7 @@ services:
       - ./backend:/app
     environment:
       - ENVIRONMENT=development
+      - API_KEY=${API_KEY}
       - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - NOTIFICATION_EMAILS=${NOTIFICATION_EMAILS}
@@ -50,6 +52,8 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
     env_file:
       - .env
     networks:

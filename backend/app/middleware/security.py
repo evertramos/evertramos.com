@@ -3,6 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import time
 from typing import Dict, Optional
 import logging
+from urllib.parse import urlparse
 
 from app.config import settings
 from app.utils.logging import log_security_event
@@ -17,10 +18,20 @@ class APIKeyAuth(HTTPBearer):
         super(APIKeyAuth, self).__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request) -> Optional[HTTPAuthorizationCredentials]:
+        # Validate origin first
+        if not self.validate_origin(request):
+            client_ip = get_client_ip(request)
+            origin = request.headers.get('origin', 'none').replace('\n', '').replace('\r', '')[:100]
+            log_security_event("INVALID_ORIGIN", client_ip, f"Origin: {origin}")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid origin"
+            )
+        
         credentials: HTTPAuthorizationCredentials = await super(APIKeyAuth, self).__call__(request)
         
         if credentials:
-            if not self.verify_api_key(credentials.credentials):
+            if not self.verify_api_key(credentials.credentials, request):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Invalid API key"
@@ -32,11 +43,33 @@ class APIKeyAuth(HTTPBearer):
                 detail="API key required"
             )
 
-    def verify_api_key(self, api_key: str) -> bool:
+    def validate_origin(self, request: Request) -> bool:
+        """Validate request origin against allowed domains"""
+        origin = request.headers.get("origin")
+        referer = request.headers.get("referer")
+        
+        # Allow requests without origin/referer for direct API calls (development)
+        if not origin and not referer:
+            return settings.environment == "development"
+        
+        # Check origin header
+        if origin:
+            parsed = urlparse(origin)
+            return parsed.hostname in settings.allowed_hosts_list
+        
+        # Check referer as fallback
+        if referer:
+            parsed = urlparse(referer)
+            return parsed.hostname in settings.allowed_hosts_list
+        
+        return False
+    
+    def verify_api_key(self, api_key: str, request: Request) -> bool:
         """Verify API key"""
         is_valid = api_key == settings.api_key
         if not is_valid:
-            log_security_event("INVALID_API_KEY", "unknown", f"Key: {api_key[:10]}...")
+            client_ip = get_client_ip(request)
+            log_security_event("INVALID_API_KEY", client_ip, f"Key: {api_key[:10].replace('\n', '').replace('\r', '')}...")
         return is_valid
 
 
@@ -73,7 +106,7 @@ def check_rate_limit(request: Request) -> bool:
     total_requests = sum(rate_limit_storage[client_ip].values())
     
     if total_requests >= settings.rate_limit_requests:
-        logger.warning(f"Rate limit exceeded for IP: {client_ip}")
+        logger.warning(f"Rate limit exceeded for IP: {client_ip.replace('\n', '').replace('\r', '')}")
         log_security_event("RATE_LIMIT_EXCEEDED", client_ip, f"Requests: {total_requests}")
         return False
     

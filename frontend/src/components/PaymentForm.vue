@@ -32,6 +32,8 @@
             type="email"
             id="email"
             required
+            @blur="validateEmail"
+            @input="clearEmailError"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             :class="{ 'border-red-500': errors.email }"
             placeholder="john@example.com"
@@ -335,7 +337,9 @@ const validateForm = () => {
     isValid = false
   }
   
-  if (!form.email || !form.email.includes('@')) {
+  // Enhanced email validation
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  if (!form.email || !emailRegex.test(form.email)) {
     errors.email = t('validation.email_invalid')
     isValid = false
   }
@@ -385,11 +389,16 @@ const handleSubmit = async () => {
     }
     
     // Create payment on backend
+    const apiKey = import.meta.env.PUBLIC_API_KEY
+    if (!apiKey) {
+      throw new Error('API key not configured')
+    }
+    
     const response = await fetch(`${BACKEND_URL}/api/v1/payments/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ezyba-secure-api-key-2024'
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify(paymentData)
     })
@@ -428,6 +437,20 @@ const handleSubmit = async () => {
   }
   
   // Don't set loading.value = false on success - let redirect handle it
+}
+
+// Email validation functions
+const validateEmail = () => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  if (form.email && !emailRegex.test(form.email)) {
+    errors.email = t('validation.email_invalid')
+  }
+}
+
+const clearEmailError = () => {
+  if (errors.email) {
+    errors.email = ''
+  }
 }
 
 // Helper functions

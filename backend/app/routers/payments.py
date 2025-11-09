@@ -48,7 +48,7 @@ async def create_payment(
     request_id = str(uuid.uuid4())[:8]
     
     try:
-        logger.info(f"[{request_id}] Processing payment request for {payment_request.email}")
+        logger.info(f"[{request_id}] Processing payment request for {payment_request.email.replace('\n', '').replace('\r', '')[:50]}")
         
         # Verify Turnstile token first
         client_ip = request.client.host if request.client else None
@@ -138,7 +138,7 @@ async def create_payment(
     except HTTPException:
         raise
     except Exception as e:
-        log_error(request_id, e, f"Payment creation for {payment_request.email}")
+        log_error(request_id, e, f"Payment creation for {payment_request.email.replace('\n', '').replace('\r', '')[:50]}")
         logger.error(f"[{request_id}] Unexpected error in create_payment: {e}")
         
         # Send failure email
