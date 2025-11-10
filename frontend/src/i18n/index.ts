@@ -139,8 +139,19 @@ export const translations = {
 };
 
 export function getLangFromUrl(url: URL) {
-  const [, lang] = url.pathname.split('/');
-  if (lang in languages) return lang as keyof typeof languages;
+  // Check domain first
+  if (url.hostname === 'evertramos.com') {
+    return 'en';
+  }
+  if (url.hostname === 'evertramos.com.br') {
+    return 'pt';
+  }
+  
+  // For localhost, use query parameter or default to PT
+  if (url.hostname.includes('localhost')) {
+    return (url.searchParams.get('lang') as keyof typeof languages) || 'pt';
+  }
+  
   return defaultLang;
 }
 
@@ -148,4 +159,40 @@ export function useTranslations(lang: keyof typeof translations) {
   return function t(key: keyof typeof translations[typeof defaultLang]) {
     return translations[lang][key] || translations[defaultLang][key];
   }
+}
+
+// Reverse mapping for switching languages
+const reversePageMap = {
+  // PT to EN
+  '/': '/',
+  '/pagamento': '/payment',
+  '/privacidade': '/privacy',
+  '/termos': '/terms',
+  '/gerenciar': '/manage', 
+  '/sucesso': '/success',
+  // EN to PT
+  '/payment': '/pagamento',
+  '/privacy': '/privacidade',
+  '/terms': '/termos',
+  '/manage': '/gerenciar',
+  '/success': '/sucesso'
+};
+
+export function getAlternateUrl(currentUrl: URL, currentLang: string): string {
+  const targetLang = currentLang === 'pt' ? 'en' : 'pt';
+  const targetDomain = targetLang === 'en' ? 'evertramos.com' : 'evertramos.com.br';
+  
+  // Get current path
+  const currentPath = currentUrl.pathname;
+  
+  // Map to target language path
+  const targetPath = reversePageMap[currentPath] || currentPath;
+  
+  // For development (localhost), use query parameter
+  if (currentUrl.hostname.includes('localhost')) {
+    return `${targetPath}?lang=${targetLang}`;
+  }
+  
+  // For production, use domain-based routing
+  return `https://${targetDomain}${targetPath}`;
 }

@@ -1,5 +1,5 @@
 ---
-import { getLangFromUrl, useTranslations } from '../i18n';
+import { getLangFromUrl, useTranslations, getAlternateUrl } from '../i18n';
 import '../styles/global.css';
 
 export interface Props {
@@ -7,41 +7,10 @@ export interface Props {
   description?: string;
 }
 
-const { title, description = "Secure payment processing with Ezyba" } = Astro.props;
-
-// Simple domain-based language detection
-let lang = 'pt'; // Default to Portuguese
-if (Astro.url.hostname.includes('.com') && !Astro.url.hostname.includes('.com.br')) {
-  lang = 'en'; // .com domain uses English
-} else if (Astro.url.pathname.startsWith('/en')) {
-  lang = 'en'; // URL-based for localhost
-}
-
+const { title, description = "ER" } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-
-// Language switcher URLs - works for both localhost and production
-let alternateUrl = '#';
-if (lang === 'pt') {
-  // Portuguese to English mappings
-  if (Astro.url.pathname === '/') alternateUrl = '/en';
-  else if (Astro.url.pathname === '/pagamento') alternateUrl = '/en/payment';
-  else if (Astro.url.pathname === '/termos') alternateUrl = '/en/terms';
-  else if (Astro.url.pathname === '/privacidade') alternateUrl = '/en/privacy';
-  else if (Astro.url.pathname === '/sucesso') alternateUrl = '/en/success';
-  else if (Astro.url.pathname === '/gerenciar') alternateUrl = '/en/manage';
-  else if (Astro.url.pathname === '/admin/gerador') alternateUrl = '/en/admin/generator';
-  else alternateUrl = '/en' + Astro.url.pathname;
-} else {
-  // English to Portuguese mappings
-  if (Astro.url.pathname === '/en' || Astro.url.pathname === '/en/') alternateUrl = '/';
-  else if (Astro.url.pathname === '/en/payment') alternateUrl = '/pagamento';
-  else if (Astro.url.pathname === '/en/terms') alternateUrl = '/termos';
-  else if (Astro.url.pathname === '/en/privacy') alternateUrl = '/privacidade';
-  else if (Astro.url.pathname === '/en/success') alternateUrl = '/sucesso';
-  else if (Astro.url.pathname === '/en/manage') alternateUrl = '/gerenciar';
-  else if (Astro.url.pathname === '/en/admin/generator') alternateUrl = '/admin/gerador';
-  else alternateUrl = Astro.url.pathname.replace('/en', '') || '/';
-}
+const alternateUrl = getAlternateUrl(Astro.url, lang);
 ---
 
 <!DOCTYPE html>
@@ -88,7 +57,7 @@ if (lang === 'pt') {
         }
         
         // Save form data before language switch
-        const languageSwitchers = document.querySelectorAll('a[href*="/en"], a[href^="/"]');
+        const languageSwitchers = document.querySelectorAll('a');
         languageSwitchers.forEach(link => {
           if (link.textContent?.includes('EN') || link.textContent?.includes('PT')) {
             link.addEventListener('click', function(e) {
@@ -163,13 +132,13 @@ if (lang === 'pt') {
           </div>
           
           <div class="hidden md:flex items-center space-x-8">
-            <a href={lang === 'pt' ? '/' : '/en'} class="text-gray-700 hover:text-blue-600 transition-colors">
+            <a href="/" class="text-gray-700 hover:text-blue-600 transition-colors">
               {t('nav.home')}
             </a>
-            <a href={lang === 'pt' ? '/pagamento' : '/en/payment'} class="text-gray-700 hover:text-blue-600 transition-colors">
+            <a href={lang === 'pt' ? '/pagamento' : '/payment'} class="text-gray-700 hover:text-blue-600 transition-colors">
               {t('nav.payment')}
             </a>
-            <a href={lang === 'pt' ? '/gerenciar' : '/en/manage'} class="text-gray-700 hover:text-blue-600 transition-colors">
+            <a href={lang === 'pt' ? '/gerenciar' : '/manage'} class="text-gray-700 hover:text-blue-600 transition-colors">
               {t('nav.manage')}
             </a>
           </div>
@@ -206,13 +175,13 @@ if (lang === 'pt') {
         <!-- Mobile menu -->
         <div id="mobile-menu" class="md:hidden pb-4 hidden">
           <div class="flex flex-col space-y-2 pt-4 border-t">
-            <a href={lang === 'pt' ? '/' : '/en'} class="text-gray-700 hover:text-blue-600 transition-colors py-2">
+            <a href="/" class="text-gray-700 hover:text-blue-600 transition-colors py-2">
               {t('nav.home')}
             </a>
-            <a href={lang === 'pt' ? '/pagamento' : '/en/payment'} class="text-gray-700 hover:text-blue-600 transition-colors py-2">
+            <a href={lang === 'pt' ? '/pagamento' : '/payment'} class="text-gray-700 hover:text-blue-600 transition-colors py-2">
               {t('nav.payment')}
             </a>
-            <a href={lang === 'pt' ? '/gerenciar' : '/en/manage'} class="text-gray-700 hover:text-blue-600 transition-colors py-2">
+            <a href={lang === 'pt' ? '/gerenciar' : '/manage'} class="text-gray-700 hover:text-blue-600 transition-colors py-2">
               {t('nav.manage')}
             </a>
           </div>
@@ -232,10 +201,10 @@ if (lang === 'pt') {
           </div>
           
           <div class="flex items-center space-x-6 text-sm">
-            <a href={lang === 'pt' ? '/privacidade' : '/en/privacy'} class="text-gray-600 hover:text-blue-600 transition-colors">
+            <a href={lang === 'pt' ? '/privacidade' : '/privacy'} class="text-gray-600 hover:text-blue-600 transition-colors">
               {t('footer.privacy')}
             </a>
-            <a href={lang === 'pt' ? '/termos' : '/en/terms'} class="text-gray-600 hover:text-blue-600 transition-colors">
+            <a href={lang === 'pt' ? '/termos' : '/terms'} class="text-gray-600 hover:text-blue-600 transition-colors">
               {t('footer.terms')}
             </a>
           </div>
