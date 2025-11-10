@@ -213,7 +213,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
 import { loadStripe } from '@stripe/stripe-js'
-import { saveFormData, loadFormData, clearFormData, type FormData } from '../utils/formPersistence'
+import { saveFormData, loadFormData, clearFormData, cleanupExpiredData, type FormData } from '../utils/formPersistence'
 import { generateSuccessToken } from '../utils/successToken'
 
 // Props
@@ -286,9 +286,12 @@ const initializeTurnstile = () => {
 // Initialize Stripe
 const initializeStripe = async () => {
   try {
-    // Get Stripe config from backend
+    // Get Stripe config and session key from backend
     const response = await fetch(`${BACKEND_URL}/api/v1/payments/config`)
     const config = await response.json()
+    
+    // Store session key for API calls
+    sessionStorage.setItem('session_key', config.session_key)
     
     stripe = await loadStripe(config.publishable_key)
     elements = stripe.elements({
@@ -389,16 +392,16 @@ const handleSubmit = async () => {
     }
     
     // Create payment on backend
-    const apiKey = import.meta.env.PUBLIC_API_KEY
-    if (!apiKey) {
-      throw new Error('API key not configured')
+    const sessionKey = sessionStorage.getItem('session_key')
+    if (!sessionKey) {
+      throw new Error('Session expired. Please refresh the page.')
     }
     
     const response = await fetch(`${BACKEND_URL}/api/v1/payments/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'X-Session-Key': sessionKey
       },
       body: JSON.stringify(paymentData)
     })
@@ -528,6 +531,9 @@ watch(
 
 // Lifecycle
 onMounted(() => {
+  // Clean up any expired form data first
+  cleanupExpiredData()
+  
   initializeStripe()
   initializeTurnstile() // Auto-bypassed for development
   fillFormFromURL()

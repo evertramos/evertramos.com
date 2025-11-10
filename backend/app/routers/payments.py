@@ -13,12 +13,12 @@ from app.models.payment import (
 from app.services.stripe_service import StripeService
 from app.services.email_service import EmailService
 from app.services.turnstile_service import TurnstileService
-from app.middleware.security import APIKeyAuth
 from app.utils.logging import log_payment_attempt, log_error
+from app.middleware.api_auth import SecureAPIAuth
 import uuid
 
 router = APIRouter(prefix="/payments", tags=["payments"])
-api_key_auth = APIKeyAuth()
+api_auth = SecureAPIAuth()
 logger = logging.getLogger(__name__)
 
 
@@ -38,7 +38,6 @@ def get_turnstile_service() -> TurnstileService:
 async def create_payment(
     payment_request: PaymentRequest,
     request: Request,
-    credentials: HTTPAuthorizationCredentials = Depends(api_key_auth),
     stripe_service: StripeService = Depends(get_stripe_service),
     email_service: EmailService = Depends(get_email_service),
     turnstile_service: TurnstileService = Depends(get_turnstile_service)
@@ -48,7 +47,20 @@ async def create_payment(
     request_id = str(uuid.uuid4())[:8]
     
     try:
-        logger.info(f"[{request_id}] Processing payment request for {payment_request.email.replace('\n', '').replace('\r', '')[:50]}")
+        # Validate session key from frontend
+        session_key = request.headers.get("X-Session-Key")
+        if not session_key:
+            raise HTTPException(status_code=401, detail="Session key required")
+        
+        from app.services.session_service import session_service
+        client_ip = request.client.host if request.client else "unknown"
+        user_agent = request.headers.get("user-agent", "")
+        
+        if not session_service.validate_session_key(session_key, client_ip, user_agent):
+            raise HTTPException(status_code=401, detail="Invalid or expired session")
+        
+        sanitized_email = payment_request.email.replace('\n', '').replace('\r', '')[:50]
+        logger.info(f"[{request_id}] Processing payment request for {sanitized_email}")
         
         # Verify Turnstile token first
         client_ip = request.client.host if request.client else None
@@ -138,7 +150,8 @@ async def create_payment(
     except HTTPException:
         raise
     except Exception as e:
-        log_error(request_id, e, f"Payment creation for {payment_request.email.replace('\n', '').replace('\r', '')[:50]}")
+        sanitized_email = payment_request.email.replace('\n', '').replace('\r', '')[:50]
+        log_error(request_id, e, f"Payment creation for {sanitized_email}")
         logger.error(f"[{request_id}] Unexpected error in create_payment: {e}")
         
         # Send failure email
@@ -153,12 +166,24 @@ async def create_payment(
 @router.post("/customer-portal", response_model=CustomerPortalResponse)
 async def create_customer_portal(
     portal_request: CustomerPortalRequest,
-    credentials: HTTPAuthorizationCredentials = Depends(api_key_auth),
+    request: Request,
     stripe_service: StripeService = Depends(get_stripe_service)
 ) -> CustomerPortalResponse:
     """Create customer portal session for subscription management"""
     
     try:
+        # Validate session key from frontend
+        session_key = request.headers.get("X-Session-Key")
+        if not session_key:
+            raise HTTPException(status_code=401, detail="Session key required")
+        
+        from app.services.session_service import session_service
+        client_ip = request.client.host if request.client else "unknown"
+        user_agent = request.headers.get("user-agent", "")
+        
+        if not session_service.validate_session_key(session_key, client_ip, user_agent):
+            raise HTTPException(status_code=401, detail="Invalid or expired session")
+        
         logger.info(f"Creating portal session for customer: {portal_request.customer_id}")
         
         portal_result = await stripe_service.create_customer_portal_session(
@@ -183,12 +208,23 @@ async def create_customer_portal(
 
 
 @router.get("/config")
-async def get_stripe_config() -> Dict[str, Any]:
-    """Get Stripe publishable key for frontend"""
+async def get_stripe_config(request: Request) -> Dict[str, Any]:
+    """Get Stripe publishable key and session token for frontend"""
     from app.config import settings
+    from app.services.session_service import session_service
+    
+    # Validate origin first
+    if not await api_auth.validate_request(request):
+        raise HTTPException(status_code=403, detail="Unauthorized request")
+    
+    # Generate session key for this client
+    client_ip = request.client.host if request.client else "unknown"
+    user_agent = request.headers.get("user-agent", "")
+    session_key = session_service.generate_session_key(client_ip, user_agent)
     
     return {
         "publishable_key": settings.stripe_publishable_key,
+        "session_key": session_key,
         "supported_currencies": ["brl", "usd"],
         "supported_payment_types": ["one_time", "monthly", "yearly"]
     }

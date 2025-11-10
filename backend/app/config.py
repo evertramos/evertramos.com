@@ -26,8 +26,10 @@ class Settings(BaseSettings):
     cors_origins: str  # Required - comma-separated origins
     allowed_hosts: str  # Required - comma-separated hosts
     
-    # API Security
-    api_key: str  # Required - generate with scripts/generate-api-key.py
+    # Internal API Security (Never expose to frontend)
+    api_key: str  # Server-side only - for internal auth
+    
+    # Rate Limiting
     rate_limit_requests: int = 100
     rate_limit_window: int = 3600  # 1 hour
     

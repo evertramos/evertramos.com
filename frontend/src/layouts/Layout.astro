@@ -102,18 +102,34 @@ if (Astro.url.hostname.includes('localhost')) {
               };
               
               if (formData.name || formData.email || formData.amount) {
-                localStorage.setItem('ezyba_form_data', JSON.stringify(formData));
+                const now = Date.now();
+                const storedData = {
+                  data: formData,
+                  timestamp: now,
+                  expiresAt: now + (10 * 60 * 1000) // 10 minutes
+                };
+                localStorage.setItem('ezyba_form_data', JSON.stringify(storedData));
               }
             });
           }
         });
         
-        // Restore form data on page load
+        // Auto-cleanup expired form data and restore on page load
         setTimeout(() => {
           const savedFormData = localStorage.getItem('ezyba_form_data');
           if (savedFormData) {
             try {
-              const formData = JSON.parse(savedFormData);
+              const storedData = JSON.parse(savedFormData);
+              const now = Date.now();
+              
+              // Check if data has expired
+              if (storedData.expiresAt && now > storedData.expiresAt) {
+                localStorage.removeItem('ezyba_form_data');
+                return;
+              }
+              
+              // Use the actual form data
+              const formData = storedData.data || storedData;
               const nameField = document.getElementById('name');
               const emailField = document.getElementById('email');
               const phoneField = document.getElementById('phone');

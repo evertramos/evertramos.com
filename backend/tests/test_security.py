@@ -74,7 +74,7 @@ class TestSecurity:
             "payment_type": "one_time"
         }
         
-        headers = {"Authorization": "Bearer ezyba-secure-api-key-2024"}
+        headers = {"Authorization": "Bearer your-generated-secure-api-key-here"}
         response = client.post("/api/v1/payments/create", json=payment_data, headers=headers)
         
         assert response.status_code == 200

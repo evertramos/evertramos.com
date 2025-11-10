@@ -69,7 +69,8 @@ class APIKeyAuth(HTTPBearer):
         is_valid = api_key == settings.api_key
         if not is_valid:
             client_ip = get_client_ip(request)
-            log_security_event("INVALID_API_KEY", client_ip, f"Key: {api_key[:10].replace('\n', '').replace('\r', '')}...")
+            sanitized_key = api_key[:10].replace('\n', '').replace('\r', '')
+            log_security_event("INVALID_API_KEY", client_ip, f"Key: {sanitized_key}...")
         return is_valid
 
 
@@ -106,7 +107,8 @@ def check_rate_limit(request: Request) -> bool:
     total_requests = sum(rate_limit_storage[client_ip].values())
     
     if total_requests >= settings.rate_limit_requests:
-        logger.warning(f"Rate limit exceeded for IP: {client_ip.replace('\n', '').replace('\r', '')}")
+        sanitized_ip = client_ip.replace('\n', '').replace('\r', '')
+        logger.warning(f"Rate limit exceeded for IP: {sanitized_ip}")
         log_security_event("RATE_LIMIT_EXCEEDED", client_ip, f"Requests: {total_requests}")
         return False
     
