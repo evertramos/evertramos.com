@@ -21,7 +21,9 @@ class TestSecurity:
             "email": "john@example.com",
             "amount": 1000,
             "currency": "usd",
-            "payment_type": "one_time"
+            "payment_type": "one_time",
+            "turnstile_token": "test_token",
+            "language": "en"
         }
         
         response = client.post("/api/v1/payments/create", json=payment_data)
@@ -35,7 +37,9 @@ class TestSecurity:
             "email": "john@example.com",
             "amount": 1000,
             "currency": "usd",
-            "payment_type": "one_time"
+            "payment_type": "one_time",
+            "turnstile_token": "test_token",
+            "language": "en"
         }
         
         headers = {"Authorization": "Bearer invalid-key"}
@@ -45,7 +49,7 @@ class TestSecurity:
     
     @patch('app.services.stripe_service.StripeService.create_customer')
     @patch('app.services.stripe_service.StripeService.create_payment_intent')
-    @patch('app.services.email_service.EmailService.send_payment_confirmation')
+    @patch('app.services.mailtrap_service.MailtrapService.send_payment_confirmation')
     def test_api_with_valid_key_succeeds(self, mock_email, mock_payment, mock_customer):
         """Test that API calls with valid key succeed"""
         
@@ -71,7 +75,9 @@ class TestSecurity:
             "email": "john@example.com",
             "amount": 1000,
             "currency": "usd",
-            "payment_type": "one_time"
+            "payment_type": "one_time",
+            "turnstile_token": "test_token",
+            "language": "en"
         }
         
         headers = {"Authorization": "Bearer your-generated-secure-api-key-here"}

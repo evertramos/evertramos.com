@@ -1,5 +1,6 @@
 <template>
-  <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
+  <div class="payment-form-container">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
     <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">
       {{ t('payment.title') }}
     </h2>
@@ -191,26 +192,31 @@
         </div>
       </div>
     </div>
-  </div>
-  
-  <!-- Processing Overlay -->
-  <div v-if="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
-      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-      <h3 class="text-lg font-semibold text-gray-900 mb-2">
-        {{ t('payment.processing_title') }}
-      </h3>
-      <p class="text-gray-600 text-sm">
-        {{ t('payment.processing_message') }}
-      </p>
-      <div class="mt-4 text-xs text-gray-500">
-        {{ t('payment.processing_wait') }}
+    </div>
+    
+    <!-- Processing Overlay -->
+    <div v-if="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">
+          {{ t('payment.processing_title') }}
+        </h3>
+        <p class="text-gray-600 text-sm">
+          {{ t('payment.processing_message') }}
+        </p>
+        <div class="mt-4 text-xs text-gray-500">
+          {{ t('payment.processing_wait') }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+// Disable automatic attribute inheritance to prevent warnings
+defineOptions({
+  inheritAttrs: false
+})
 import { ref, reactive, onMounted, watch } from 'vue'
 import { loadStripe } from '@stripe/stripe-js'
 import { saveFormData, loadFormData, clearFormData, cleanupExpiredData, type FormData } from '../utils/formPersistence'
@@ -388,7 +394,8 @@ const handleSubmit = async () => {
       amount: Math.round(parseFloat(form.amount) * 100), // Convert to cents
       currency: form.currency,
       payment_type: form.paymentType,
-      turnstile_token: turnstileToken.value
+      turnstile_token: turnstileToken.value,
+      language: props.lang // Send user's language
     }
     
     // Create payment on backend

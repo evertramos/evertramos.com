@@ -10,6 +10,7 @@ import html
 
 from app.config import settings
 from app.models.payment import PaymentRequest, PaymentType
+from app.templates.email_templates import EMAIL_TEMPLATES, BASE_EMAIL_TEMPLATE
 
 logger = logging.getLogger(__name__)
 
@@ -79,58 +80,56 @@ class EmailService:
             
             await aiosmtplib.send(message, **smtp_kwargs)
             
-            logger.info(f"Email sent successfully to: {valid_emails}")
+            logger.info(f"[MAILPIT] Email sent successfully to: {valid_emails}")
             return True
             
         except Exception as e:
-            logger.error(f"Failed to send email: {e}")
+            logger.error(f"[MAILPIT] Failed to send email: {e}")
             return False
     
     async def send_payment_confirmation(self, payment_request: PaymentRequest, payment_id: str, success: bool):
         """Send payment confirmation emails"""
         
-        # Email to customer
-        customer_subject = "Payment Confirmation - Ezyba" if success else "Payment Failed - Ezyba"
-        customer_template = Template("""
-        <html>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333;">{{ 'Payment Confirmed!' if success else 'Payment Failed' }}</h2>
-            
-            {% if success %}
-            <p>Hi {{ name }},</p>
-            <p>Your payment has been successfully processed!</p>
-            {% else %}
-            <p>Hi {{ name }},</p>
-            <p>Unfortunately, your payment could not be processed. Please try again or contact support.</p>
-            {% endif %}
-            
-            <div style="background: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
-                <h3>Payment Details:</h3>
-                <p><strong>Amount:</strong> {{ amount_display }}</p>
-                <p><strong>Type:</strong> {{ payment_type_display }}</p>
-                <p><strong>Payment ID:</strong> {{ payment_id }}</p>
-            </div>
-            
-            <p>If you have any questions, please don't hesitate to contact us.</p>
-            <p>Best regards,<br>Ezyba Team</p>
-        </body>
-        </html>
-        """)
+        # Get language (default to pt)
+        lang = payment_request.language or "pt"
+        templates = EMAIL_TEMPLATES.get(lang, EMAIL_TEMPLATES["pt"])
+        
+        logger.info(f"[MAILPIT] Sending payment confirmation - Success: {success}, Language: {lang}, Email: {payment_request.email}")
         
         # Format amount for display
-        amount_display = f"${payment_request.amount / 100:.2f}" if payment_request.currency.value == "usd" else f"R${payment_request.amount / 100:.2f}"
-        payment_type_display = {
-            PaymentType.ONE_TIME: "One-time payment",
-            PaymentType.MONTHLY: "Monthly subscription",
-            PaymentType.YEARLY: "Yearly subscription"
-        }.get(payment_request.payment_type, "Unknown")
+        currency_symbol = settings.usd_symbol if payment_request.currency.value == "usd" else settings.brl_symbol
+        amount_display = f"{currency_symbol}{payment_request.amount / 100:.2f}"
         
-        customer_html = customer_template.render(
-            success=success,
+        # Get payment type display text
+        payment_type_display = templates["payment_types"].get(
+            payment_request.payment_type.value, 
+            payment_request.payment_type.value
+        )
+        
+        # Customer email
+        template_key = "customer_success" if success else "customer_failed"
+        customer_template = templates[template_key]
+        
+        customer_subject = customer_template["subject"].format(company_name=settings.company_name)
+        
+        # Render content first
+        content_html = Template(customer_template["content"]).render(
             name=html.escape(payment_request.name),
             amount_display=amount_display,
             payment_type_display=payment_type_display,
-            payment_id=payment_id
+            payment_id=payment_id,
+            support_email=settings.support_email,
+            company_name=settings.company_name
+        )
+        
+        # Then render full email with base template
+        customer_html = Template(BASE_EMAIL_TEMPLATE).render(
+            lang=lang,
+            subject=customer_subject,
+            header_title="Pagamento" if lang == "pt" else "Payment",
+            content=content_html,
+            company_name=settings.company_name,
+            support_email=settings.support_email
         )
         
         # Send to customer
@@ -140,39 +139,10 @@ class EmailService:
             customer_html
         )
         
-        # Email to admin
-        admin_subject = f"New Payment {'Received' if success else 'Failed'} - Ezyba"
-        admin_template = Template("""
-        <html>
-        <body style="font-family: Arial, sans-serif;">
-            <h2>{{ 'New Payment Received' if success else 'Payment Failed' }}</h2>
-            
-            <div style="background: #f5f5f5; padding: 20px; border-radius: 5px;">
-                <h3>Customer Information:</h3>
-                <p><strong>Name:</strong> {{ name }}</p>
-                <p><strong>Email:</strong> {{ email }}</p>
-                {% if phone %}<p><strong>Phone:</strong> {{ phone }}</p>{% endif %}
-                
-                <h3>Payment Details:</h3>
-                <p><strong>Amount:</strong> {{ amount_display }}</p>
-                <p><strong>Currency:</strong> {{ currency }}</p>
-                <p><strong>Type:</strong> {{ payment_type_display }}</p>
-                <p><strong>Payment ID:</strong> {{ payment_id }}</p>
-                <p><strong>Status:</strong> {{ 'SUCCESS' if success else 'FAILED' }}</p>
-            </div>
-        </body>
-        </html>
-        """)
-        
-        admin_html = admin_template.render(
-            success=success,
-            name=html.escape(payment_request.name),
-            email=html.escape(payment_request.email),
-            phone=html.escape(payment_request.phone) if payment_request.phone else None,
-            amount_display=amount_display,
-            currency=payment_request.currency.value.upper(),
-            payment_type_display=payment_type_display,
-            payment_id=payment_id
+        # Admin email (always in Portuguese)
+        admin_subject = f"{'Novo Pagamento Recebido' if success else 'Falha no Pagamento'} - {settings.company_name}"
+        admin_html = self._render_admin_template(
+            success, payment_request, amount_display, payment_type_display, payment_id
         )
         
         # Send to admin emails
@@ -180,4 +150,42 @@ class EmailService:
             settings.notification_email_list,
             admin_subject,
             admin_html
+        )
+    
+    def _render_admin_template(self, success: bool, payment_request: PaymentRequest, amount_display: str, payment_type_display: str, payment_id: str) -> str:
+        """Render admin email template"""
+        template = Template("""
+        <html>
+        <body style="font-family: Arial, sans-serif;">
+            <h2>{{ 'Novo Pagamento Recebido' if success else 'Falha no Pagamento' }} - {{ company_name }}</h2>
+            
+            <div style="background: #f5f5f5; padding: 20px; border-radius: 5px;">
+                <h3>Informações do Cliente:</h3>
+                <p><strong>Nome:</strong> {{ name }}</p>
+                <p><strong>Email:</strong> {{ email }}</p>
+                {% if phone %}<p><strong>Telefone:</strong> {{ phone }}</p>{% endif %}
+                <p><strong>Idioma:</strong> {{ language }}</p>
+                
+                <h3>Detalhes do Pagamento:</h3>
+                <p><strong>Valor:</strong> {{ amount_display }}</p>
+                <p><strong>Moeda:</strong> {{ currency }}</p>
+                <p><strong>Tipo:</strong> {{ payment_type_display }}</p>
+                <p><strong>ID do Pagamento:</strong> {{ payment_id }}</p>
+                <p><strong>Status:</strong> {{ 'SUCESSO' if success else 'FALHA' }}</p>
+            </div>
+        </body>
+        </html>
+        """)
+        
+        return template.render(
+            success=success,
+            name=html.escape(payment_request.name),
+            email=html.escape(payment_request.email),
+            phone=html.escape(payment_request.phone) if payment_request.phone else None,
+            language=payment_request.language or "pt",
+            amount_display=amount_display,
+            currency=payment_request.currency.value.upper(),
+            payment_type_display=payment_type_display,
+            payment_id=payment_id,
+            company_name=settings.company_name
         )

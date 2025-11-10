@@ -5,7 +5,7 @@ import vue from '@astrojs/vue';
 export default defineConfig({
   vite: {
     define: {
-      'import.meta.env.STRIPE_CUSTOMER_PORTAL_URL': JSON.stringify(process.env.STRIPE_CUSTOMER_PORTAL_URL || 'http://localhost:8000/api/v1/payments/customer-portal')
+      'import.meta.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL': JSON.stringify(process.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL || 'http://localhost:8000/api/v1/payments/customer-portal')
     }
   },
   integrations: [tailwind(), vue()],

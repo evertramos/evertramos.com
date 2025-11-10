@@ -28,6 +28,9 @@ class PaymentRequest(BaseModel):
     # Security
     turnstile_token: str = Field(..., min_length=1, description="Cloudflare Turnstile token")
     
+    # Localization
+    language: Optional[str] = Field("pt", pattern=r'^(pt|en)$', description="User interface language")
+    
     @validator('amount')
     def validate_amount(cls, v, values):
         # Minimum amounts based on Stripe requirements

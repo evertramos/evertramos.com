@@ -32,7 +32,7 @@ class TestPayments:
     
     @patch('app.services.stripe_service.StripeService.create_customer')
     @patch('app.services.stripe_service.StripeService.create_payment_intent')
-    @patch('app.services.email_service.EmailService.send_payment_confirmation')
+    @patch('app.services.mailtrap_service.MailtrapService.send_payment_confirmation')
     def test_create_one_time_payment_success(self, mock_email, mock_payment, mock_customer):
         """Test successful one-time payment creation"""
         
@@ -60,7 +60,9 @@ class TestPayments:
             "phone": "+1234567890",
             "amount": 1000,  # $10.00
             "currency": "usd",
-            "payment_type": "one_time"
+            "payment_type": "one_time",
+            "turnstile_token": "test_token",
+            "language": "en"
         }
         
         response = client.post("/api/v1/payments/create", json=payment_data)
@@ -79,7 +81,9 @@ class TestPayments:
             "email": "john@example.com",
             "amount": 10,  # Too low
             "currency": "usd",
-            "payment_type": "one_time"
+            "payment_type": "one_time",
+            "turnstile_token": "test_token",
+            "language": "en"
         }
         
         response = client.post("/api/v1/payments/create", json=payment_data)
@@ -92,7 +96,9 @@ class TestPayments:
             "email": "invalid-email",
             "amount": 1000,
             "currency": "usd",
-            "payment_type": "one_time"
+            "payment_type": "one_time",
+            "turnstile_token": "test_token",
+            "language": "en"
         }
         
         response = client.post("/api/v1/payments/create", json=payment_data)

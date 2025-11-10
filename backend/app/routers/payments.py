@@ -11,7 +11,7 @@ from app.models.payment import (
     PaymentType
 )
 from app.services.stripe_service import StripeService
-from app.services.email_service import EmailService
+from app.services.email_factory import get_email_service
 from app.services.turnstile_service import TurnstileService
 from app.utils.logging import log_payment_attempt, log_error
 from app.middleware.api_auth import SecureAPIAuth
@@ -26,8 +26,8 @@ def get_stripe_service() -> StripeService:
     return StripeService()
 
 
-def get_email_service() -> EmailService:
-    return EmailService()
+def get_email_service_instance():
+    return get_email_service()
 
 
 def get_turnstile_service() -> TurnstileService:
@@ -39,7 +39,7 @@ async def create_payment(
     payment_request: PaymentRequest,
     request: Request,
     stripe_service: StripeService = Depends(get_stripe_service),
-    email_service: EmailService = Depends(get_email_service),
+    email_service = Depends(get_email_service_instance),
     turnstile_service: TurnstileService = Depends(get_turnstile_service)
 ) -> PaymentResponse:
     """Create a payment (one-time or subscription)"""
