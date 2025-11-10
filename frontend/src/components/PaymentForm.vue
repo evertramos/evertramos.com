@@ -266,12 +266,21 @@ let cardElement: any = null
 // Turnstile - Disabled for development
 let turnstile: any = null
 
-const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || 'https://pay.ezyba.com'
+// Backend URL must be configured via environment variable
+if (!import.meta.env.PUBLIC_BACKEND_URL) {
+  throw new Error('PUBLIC_BACKEND_URL environment variable is required')
+}
+
+const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL
 
 // Initialize Turnstile
 const initializeTurnstile = () => {
+  if (!import.meta.env.PUBLIC_TURNSTILE_SITE_KEY) {
+    throw new Error('PUBLIC_TURNSTILE_SITE_KEY environment variable is required')
+  }
+  
   if (window.turnstile) {
-    const sitekey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'
+    const sitekey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
     turnstile = window.turnstile.render('#turnstile-widget', {
       sitekey: sitekey,
       language: props.lang, // Set language based on page language

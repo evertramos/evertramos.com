@@ -15,7 +15,16 @@ const alternateUrl = getAlternateUrl(Astro.url, lang);
 // Dynamic CSP based on environment
 const isProduction = import.meta.env.PROD;
 const backendUrl = isProduction ? 'https://pay.evertramos.com.br' : 'http://localhost:8000';
-const csp = `default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.stripe.com https://merchant-ui-api.stripe.com https://challenges.cloudflare.com ${backendUrl}; frame-src 'self' https://challenges.cloudflare.com https://js.stripe.com;`;
+const csp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://js.stripe.com https://challenges.cloudflare.com https://static.cloudflareinsights.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: https:",
+  `connect-src 'self' https://api.stripe.com https://merchant-ui-api.stripe.com https://challenges.cloudflare.com https://cloudflareinsights.com ${backendUrl}`,
+  "frame-src 'self' https://challenges.cloudflare.com https://js.stripe.com",
+  "object-src 'none'",
+  "base-uri 'self'"
+].join('; ') + ';';
 ---
 
 <!DOCTYPE html>
