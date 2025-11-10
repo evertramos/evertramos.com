@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { translations } from '../../i18n';
-import { getContextualEmail } from '../utils/emailUtils';
+import { getContextualEmail } from '../../utils/emailUtils';
 
 const lang = 'br';
 const t = (key: string) => translations[lang][key] || key;
@@ -10,12 +10,12 @@ const financialEmail = getContextualEmail('FINANCIAL');
 
 <script>
   // Protect success page from direct access
-  import { shouldRedirectFromSuccess, consumeSuccessToken } from '../utils/successToken';
+  import { shouldRedirectFromSuccess, consumeSuccessToken } from '../../utils/successToken';
   
   // Check if user should be on this page
   if (shouldRedirectFromSuccess()) {
     // Redirect to payment page if no valid token
-    window.location.href = '/pagamento';
+    window.location.href = '/br/pagamento';
   } else {
     // Consume token to prevent reuse
     consumeSuccessToken();
@@ -32,7 +32,7 @@ const financialEmail = getContextualEmail('FINANCIAL');
       // If no token in URL, redirect
       if (!token) {
         setTimeout(() => {
-          window.location.href = '/pagamento';
+          window.location.href = '/br/pagamento';
         }, 100);
       }
     });
@@ -73,7 +73,7 @@ const financialEmail = getContextualEmail('FINANCIAL');
             Gerenciar Pagamentos
           </a>
           
-          <a href="/" 
+          <a href="/br/" 
              class="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors inline-block">
             Voltar ao Início
           </a>
