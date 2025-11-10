@@ -28,6 +28,12 @@ services:
       - PUBLIC_FINANCIAL_EMAIL=${PUBLIC_FINANCIAL_EMAIL}
       - PUBLIC_LEGAL_EMAIL=${PUBLIC_LEGAL_EMAIL}
       - PUBLIC_STRIPE_CUSTOMER_PORTAL_URL=${PUBLIC_STRIPE_CUSTOMER_PORTAL_URL}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - ezyba-network
     command: npm run dev
@@ -58,6 +64,12 @@ services:
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - ezyba-network
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload

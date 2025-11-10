@@ -10,10 +10,14 @@ export default defineConfig({
   },
   integrations: [tailwind(), vue()],
   i18n: {
-    defaultLocale: "pt",
-    locales: ["pt", "en"],
+    defaultLocale: "br",
+    locales: ["br", "en"],
     routing: {
-      prefixDefaultLocale: false
+      prefixDefaultLocale: true,
+      redirectToDefaultLocale: false
+    },
+    fallback: {
+      en: "br"
     }
   },
   server: {

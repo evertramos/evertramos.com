@@ -1,12 +1,12 @@
 export const languages = {
-  pt: 'Português',
+  br: 'Português',
   en: 'English',
 };
 
-export const defaultLang = 'pt';
+export const defaultLang = 'br';
 
 export const translations = {
-  pt: {
+  br: {
     // Navigation
     'nav.home': 'Início',
     'nav.contact': 'Contato',
@@ -139,19 +139,12 @@ export const translations = {
 };
 
 export function getLangFromUrl(url: URL) {
-  // Check domain first
-  if (url.hostname === 'evertramos.com') {
-    return 'en';
-  }
-  if (url.hostname === 'evertramos.com.br') {
-    return 'pt';
-  }
+  // Extract language from URL path
+  const [, lang] = url.pathname.split('/');
+  if (lang === 'br') return 'br';
+  if (lang === 'en') return 'en';
   
-  // For localhost, use query parameter or default to PT
-  if (url.hostname.includes('localhost')) {
-    return (url.searchParams.get('lang') as keyof typeof languages) || 'pt';
-  }
-  
+  // Fallback to default
   return defaultLang;
 }
 
@@ -161,38 +154,27 @@ export function useTranslations(lang: keyof typeof translations) {
   }
 }
 
-// Reverse mapping for switching languages
-const reversePageMap = {
-  // PT to EN
-  '/': '/',
-  '/pagamento': '/payment',
-  '/privacidade': '/privacy',
-  '/termos': '/terms',
-  '/gerenciar': '/manage', 
-  '/sucesso': '/success',
-  // EN to PT
-  '/payment': '/pagamento',
-  '/privacy': '/privacidade',
-  '/terms': '/termos',
-  '/manage': '/gerenciar',
-  '/success': '/sucesso'
+// Page mapping between languages
+const pageMap = {
+  // PT pages (br)
+  '/br/': '/en/',
+  '/br/pagamento': '/en/payment',
+  '/br/privacidade': '/en/privacy',
+  '/br/termos': '/en/terms',
+  '/br/gerenciar': '/en/manage',
+  '/br/sucesso': '/en/success',
+  // EN pages
+  '/en/': '/br/',
+  '/en/payment': '/br/pagamento',
+  '/en/privacy': '/br/privacidade',
+  '/en/terms': '/br/termos',
+  '/en/manage': '/br/gerenciar',
+  '/en/success': '/br/sucesso'
 };
 
 export function getAlternateUrl(currentUrl: URL, currentLang: string): string {
-  const targetLang = currentLang === 'pt' ? 'en' : 'pt';
-  const targetDomain = targetLang === 'en' ? 'evertramos.com' : 'evertramos.com.br';
-  
-  // Get current path
   const currentPath = currentUrl.pathname;
+  const alternatePath = pageMap[currentPath] || (currentLang === 'br' ? '/en/' : '/br/');
   
-  // Map to target language path
-  const targetPath = reversePageMap[currentPath] || currentPath;
-  
-  // For development (localhost), use query parameter
-  if (currentUrl.hostname.includes('localhost')) {
-    return `${targetPath}?lang=${targetLang}`;
-  }
-  
-  // For production, use domain-based routing
-  return `https://${targetDomain}${targetPath}`;
+  return `${currentUrl.origin}${alternatePath}`;
 }

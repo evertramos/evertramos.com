@@ -249,7 +249,7 @@ import Layout from '../../layouts/Layout.astro';
     if (currency && currency !== 'usd') params.append('currency', currency);
     if (paymentType && paymentType !== 'one_time') params.append('type', paymentType);
     
-    const baseUrlPT = window.location.origin + '/pagamento';
+    const baseUrlPT = window.location.origin + '/br/pagamento';
     const baseUrlEN = window.location.origin + '/en/payment';
     
     const linkPT = baseUrlPT + '?' + params.toString();
