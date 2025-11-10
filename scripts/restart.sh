@@ -7,7 +7,7 @@ echo "🔄 Restarting Ezyba development environment..."
 docker compose -f docker-compose.dev.yml down
 
 # Start with fresh build if needed
-docker compose -f docker-compose.dev.yml up -d --build
+DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml up -d --build
 
 echo "✅ Environment restarted!"
 echo "Frontend: http://localhost:3000"

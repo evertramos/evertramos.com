@@ -72,7 +72,7 @@ fi
 # Step 3: Build or use cache
 if [ "$REBUILD_NEEDED" = true ]; then
     echo -e "${YELLOW}🔨 Building with changes...${NC}"
-    docker compose -f docker-compose.dev.yml build --no-cache
+    DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml build --no-cache
     touch .last-build
     echo -e "${GREEN}✅ Build completed${NC}"
 else
@@ -81,7 +81,7 @@ fi
 
 # Step 4: Start containers
 echo -e "${YELLOW}🚀 Starting development environment...${NC}"
-docker compose -f docker-compose.dev.yml up -d
+DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml up -d
 
 # Step 5: Wait for services to be ready
 echo -e "${YELLOW}⏳ Waiting for services...${NC}"

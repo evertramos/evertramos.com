@@ -25,7 +25,7 @@ help:
 # Start development environment
 dev:
 	@echo "🚀 Starting development environment..."
-	docker compose -f docker-compose.dev.yml up -d
+	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml up -d --build
 	@echo "✅ Environment started!"
 	@echo "Frontend: http://localhost:3000"
 	@echo "Backend:  http://localhost:8000"
