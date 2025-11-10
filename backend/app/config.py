@@ -14,15 +14,15 @@ class Settings(BaseSettings):
     notification_emails: str  # Comma-separated emails
     
     # Mailtrap Configuration (Production)
-    mailtrap_api_token: str
-    sender_email: str
-    sender_name: str
+    mailtrap_api_token: Optional[str] = None
+    sender_email: Optional[str] = None
+    sender_name: Optional[str] = None
     
     # SMTP Configuration (Development - Mailpit)
-    smtp_host: str
+    smtp_host: Optional[str] = None
     smtp_port: int = 1025
-    smtp_user: str = ""
-    smtp_password: str = ""
+    smtp_user: Optional[str] = None
+    smtp_password: Optional[str] = None
     
     # Email Display Configuration
     company_name: str

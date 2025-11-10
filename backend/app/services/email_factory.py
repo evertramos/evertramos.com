@@ -13,5 +13,10 @@ def get_email_service():
         logger.info(f"Using EmailService (Mailpit) for environment: {settings.environment}")
         return EmailService()
     else:
+        # Validate Mailtrap configuration
+        if not settings.mailtrap_api_token:
+            logger.error("MAILTRAP_API_TOKEN is required for production environment")
+            raise ValueError("Missing Mailtrap configuration for production")
+        
         logger.info(f"Using MailtrapService (API) for environment: {settings.environment}")
         return MailtrapService()
