@@ -174,8 +174,7 @@ const pageMap = {
 
 export function getAlternateUrl(currentUrl: URL, currentLang: string): string {
   const currentPath = currentUrl.pathname;
-  const alternatePath = pageMap[currentPath] || (currentLang === 'br' ? '/en/' : '/br/');
   
-  // Use relative URL to avoid hardcoded domains
-  return alternatePath;
+  // Use direct mapping or fallback to home page
+  return pageMap[currentPath] || (currentLang === 'br' ? '/en/' : '/br/');
 }
