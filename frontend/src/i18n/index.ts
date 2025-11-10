@@ -173,7 +173,17 @@ const pageMap = {
 };
 
 export function getAlternateUrl(currentUrl: URL, currentLang: string): string {
-  const currentPath = currentUrl.pathname;
+  let currentPath = currentUrl.pathname;
+  
+  // Normalize path - remove trailing slash except for root
+  if (currentPath.length > 1 && currentPath.endsWith('/')) {
+    currentPath = currentPath.slice(0, -1);
+  }
+  
+  // Add trailing slash for root paths
+  if (currentPath === '/br' || currentPath === '/en') {
+    currentPath += '/';
+  }
   
   // Use direct mapping or fallback to home page
   return pageMap[currentPath] || (currentLang === 'br' ? '/en/' : '/br/');
