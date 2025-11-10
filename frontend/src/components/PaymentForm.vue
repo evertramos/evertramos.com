@@ -266,21 +266,18 @@ let cardElement: any = null
 // Turnstile - Disabled for development
 let turnstile: any = null
 
-// Backend URL must be configured via environment variable
-if (!import.meta.env.PUBLIC_BACKEND_URL) {
-  throw new Error('PUBLIC_BACKEND_URL environment variable is required')
-}
-
-const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL
+// Backend URL - will be validated on mount
+const BACKEND_URL = ref('')
 
 // Initialize Turnstile
 const initializeTurnstile = () => {
-  if (!import.meta.env.PUBLIC_TURNSTILE_SITE_KEY) {
-    throw new Error('PUBLIC_TURNSTILE_SITE_KEY environment variable is required')
-  }
-  
   if (window.turnstile) {
     const sitekey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
+    if (!sitekey) {
+      console.error('PUBLIC_TURNSTILE_SITE_KEY environment variable is required')
+      return
+    }
+    
     turnstile = window.turnstile.render('#turnstile-widget', {
       sitekey: sitekey,
       language: props.lang, // Set language based on page language
@@ -302,7 +299,7 @@ const initializeTurnstile = () => {
 const initializeStripe = async () => {
   try {
     // Get Stripe config and session key from backend
-    const response = await fetch(`${BACKEND_URL}/api/v1/payments/config`)
+    const response = await fetch(`${BACKEND_URL.value}/api/v1/payments/config`)
     const config = await response.json()
     
     // Store session key for API calls
@@ -413,7 +410,7 @@ const handleSubmit = async () => {
       throw new Error('Session expired. Please refresh the page.')
     }
     
-    const response = await fetch(`${BACKEND_URL}/api/v1/payments/create`, {
+    const response = await fetch(`${BACKEND_URL.value}/api/v1/payments/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -547,11 +544,20 @@ watch(
 
 // Lifecycle
 onMounted(() => {
+  // Validate environment variables
+  if (!import.meta.env.PUBLIC_BACKEND_URL) {
+    console.error('PUBLIC_BACKEND_URL environment variable is required')
+    showError('Configuration error: Backend URL not configured')
+    return
+  }
+  
+  BACKEND_URL.value = import.meta.env.PUBLIC_BACKEND_URL
+  
   // Clean up any expired form data first
   cleanupExpiredData()
   
   initializeStripe()
-  initializeTurnstile() // Auto-bypassed for development
+  initializeTurnstile()
   fillFormFromURL()
 })
 </script>
