@@ -1,11 +1,14 @@
-FROM node:20-alpine AS base
+FROM node:20-alpine AS build
 
 WORKDIR /app
-COPY package*.json ./
-RUN npm install --only=production
 
-FROM base AS build
-RUN npm install
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies for build)
+RUN npm ci
+
+# Copy source code
 COPY . .
 
 # Build arguments for environment variables
@@ -19,6 +22,7 @@ ENV PUBLIC_BACKEND_URL=$PUBLIC_BACKEND_URL
 ENV PUBLIC_TURNSTILE_SITE_KEY=$PUBLIC_TURNSTILE_SITE_KEY
 ENV PUBLIC_STRIPE_CUSTOMER_PORTAL_URL=$PUBLIC_STRIPE_CUSTOMER_PORTAL_URL
 
+# Build the application
 RUN npm run build
 
 FROM nginx:alpine AS runtime
