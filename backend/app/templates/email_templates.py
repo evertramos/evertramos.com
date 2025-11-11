@@ -12,7 +12,7 @@ BASE_EMAIL_TEMPLATE = """
         body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; }
         .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 20px; text-align: center; }
-        .logo { max-width: 200px; height: auto; margin-bottom: 10px; }
+        .logo { max-width: 80px; height: auto; margin-bottom: 10px; border-radius: 50%; }
         .header-text { color: #ffffff; font-size: 24px; font-weight: bold; margin: 0; }
         .content { padding: 40px 30px; }
         .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; }
@@ -20,7 +20,7 @@ BASE_EMAIL_TEMPLATE = """
         .error { background-color: #f8d7da; color: #721c24; }
         .details-box { background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 5px; }
         .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 14px; }
-        .button { display: inline-block; padding: 12px 24px; background-color: #667eea; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #4f46e5; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; }
         @media (max-width: 600px) { .container { width: 100% !important; } .content { padding: 20px !important; } }
     </style>
 </head>
