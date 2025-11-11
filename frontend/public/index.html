@@ -2,18 +2,23 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Redirecting...</title>
+    <title>Loading...</title>
+    <style>
+        body { margin: 0; padding: 0; background: #f9fafb; }
+    </style>
     <script>
-        // Redirect based on domain
-        const host = window.location.hostname;
-        if (host.endsWith('.com.br')) {
-            window.location.href = '/br/';
-        } else {
-            window.location.href = '/en/';
-        }
+        // Immediate redirect based on domain
+        (function() {
+            const host = window.location.hostname;
+            if (host.includes('.com.br') || host === 'evertramos.com.br') {
+                window.location.replace('/br/');
+            } else if (host.includes('.com') || host === 'evertramos.com') {
+                window.location.replace('/en/');
+            } else {
+                window.location.replace('/en/');
+            }
+        })();
     </script>
 </head>
-<body>
-    <p>Redirecting...</p>
-</body>
+<body></body>
 </html>
