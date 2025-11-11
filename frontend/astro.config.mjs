@@ -8,10 +8,8 @@ export default defineConfig({
       'import.meta.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL': JSON.stringify(process.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL || 'http://localhost:8000/api/v1/payments/customer-portal')
     },
     build: {
-      sourcemap: false
-    },
-    server: {
-      sourcemap: false
+      sourcemap: process.env.NODE_ENV === 'production' ? false : true,
+      minify: process.env.NODE_ENV === 'production' ? 'esbuild' : false
     }
   },
   integrations: [tailwind(), vue()],
