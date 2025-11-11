@@ -8,8 +8,8 @@ export default defineConfig({
       'import.meta.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL': JSON.stringify(process.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL)
     },
     build: {
-      sourcemap: process.env.NODE_ENV === 'production' ? false : true,
-      minify: process.env.NODE_ENV === 'production' ? 'esbuild' : false
+      sourcemap: false,
+      minify: 'esbuild'
     }
   },
   integrations: [tailwind(), vue()],
