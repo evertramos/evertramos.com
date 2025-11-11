@@ -3,6 +3,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL}
+        - PUBLIC_TURNSTILE_SITE_KEY=${PUBLIC_TURNSTILE_SITE_KEY}
+        - PUBLIC_STRIPE_CUSTOMER_PORTAL_URL=${PUBLIC_STRIPE_CUSTOMER_PORTAL_URL}
     container_name: evertramos-frontend
     expose:
       - "3000"

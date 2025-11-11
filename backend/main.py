@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 
 from app.config import settings
 from app.routers import payments
-from app.middleware.security import rate_limit_middleware, security_headers_middleware
+from app.middleware.security import rate_limit_middleware, security_headers_middleware, real_ip_middleware
 from app.utils.logging import setup_logging
 
 
@@ -48,6 +48,7 @@ app.add_middleware(
 )
 
 # Security middleware
+app.middleware("http")(real_ip_middleware)
 app.middleware("http")(rate_limit_middleware)
 app.middleware("http")(security_headers_middleware)
 

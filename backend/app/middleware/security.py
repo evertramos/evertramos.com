@@ -146,3 +146,14 @@ async def security_headers_middleware(request: Request, call_next):
     response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     
     return response
+
+
+async def real_ip_middleware(request: Request, call_next):
+    """Override client IP with real IP from proxy headers"""
+    real_ip = get_client_ip(request)
+    
+    # Override the client host for logging
+    if request.client and real_ip != "unknown":
+        request.client = request.client._replace(host=real_ip)
+    
+    return await call_next(request)
