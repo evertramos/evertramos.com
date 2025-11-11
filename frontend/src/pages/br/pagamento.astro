@@ -7,6 +7,20 @@ const lang = 'br';
 ---
 
 <Layout title="ER | Pagamento" description="Pagamento por serviços prestados ou apoio a projetos open source">
+  <Fragment slot="head">
+    <!-- Stripe.js - Load only if not already loaded -->
+    <script>
+      if (!window.Stripe) {
+        const script = document.createElement('script');
+        script.src = 'https://js.stripe.com/v3/';
+        script.async = true;
+        document.head.appendChild(script);
+      }
+    </script>
+    
+    <!-- Cloudflare Turnstile -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  </Fragment>
   <div class="py-12 bg-gray-50 min-h-screen">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-8">

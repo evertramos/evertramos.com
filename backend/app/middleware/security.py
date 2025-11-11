@@ -76,6 +76,10 @@ class APIKeyAuth(HTTPBearer):
 
 def get_client_ip(request: Request) -> str:
     """Get client IP address"""
+    # Check if real IP was already determined by middleware
+    if hasattr(request.state, 'real_ip'):
+        return request.state.real_ip
+    
     # Check for forwarded headers (behind proxy)
     forwarded_for = request.headers.get("X-Forwarded-For")
     if forwarded_for:
@@ -149,11 +153,10 @@ async def security_headers_middleware(request: Request, call_next):
 
 
 async def real_ip_middleware(request: Request, call_next):
-    """Override client IP with real IP from proxy headers"""
+    """Store real IP in request state for logging"""
     real_ip = get_client_ip(request)
     
-    # Override the client host for logging
-    if request.client and real_ip != "unknown":
-        request.client = request.client._replace(host=real_ip)
+    # Store real IP in request state for access by other middleware
+    request.state.real_ip = real_ip
     
     return await call_next(request)

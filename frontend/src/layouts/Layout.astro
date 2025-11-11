@@ -32,16 +32,30 @@ const alternateUrl = getAlternateUrl(Astro.url, lang);
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
     <meta name="duckduckbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
     
+    <!-- Block Cloudflare Insights beacon -->
+    <script>
+      // Block Cloudflare Insights from loading automatically
+      if (window.__CF$cv$params) {
+        delete window.__CF$cv$params;
+      }
+      
+      // Override fetch to block beacon requests
+      const originalFetch = window.fetch;
+      window.fetch = function(...args) {
+        const url = args[0];
+        if (typeof url === 'string' && url.includes('cloudflareinsights.com')) {
+          return Promise.reject(new Error('Blocked Cloudflare Insights'));
+        }
+        return originalFetch.apply(this, args);
+      };
+    </script>
+    
     <!-- Custom head content -->
     <slot name="head" />
     
     <!-- No Language Alternates (blocked from indexing) -->
     
-    <!-- Stripe.js -->
-    <script src="https://js.stripe.com/v3/"></script>
-    
-    <!-- Cloudflare Turnstile -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <!-- Scripts loaded conditionally per page -->
     
     <!-- Mobile menu script -->
     <script>
