@@ -20,7 +20,7 @@ BASE_EMAIL_TEMPLATE = """
         .error { background-color: #f8d7da; color: #721c24; }
         .details-box { background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 5px; }
         .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 14px; }
-        .button { display: inline-block; padding: 12px 24px; background-color: #4f46e5; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #1e40af; color: #ffffff !important; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; }
         @media (max-width: 600px) { .container { width: 100% !important; } .content { padding: 20px !important; } }
     </style>
 </head>
@@ -128,7 +128,7 @@ EMAIL_TEMPLATES = {
                 
                 <p style="font-size: 16px; line-height: 1.6; color: #555;">Keep this email as your receipt. If you need any assistance, we're here to help!</p>
                 
-                <a href="mailto:{{ support_email }}" class="button">💬 Contact Support</a>
+                <a href="mailto:{{ support_email }}" class="button" style="background-color: #1e40af; color: #ffffff; text-decoration: none;">💬 Contact Support</a>
                 
                 <p style="margin-top: 30px; color: #666;">Best regards,<br><strong>{{ company_name }}</strong></p>
             """
