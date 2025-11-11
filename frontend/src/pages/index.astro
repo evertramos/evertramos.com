@@ -1,4 +1,34 @@
 ---
-// Redirect root to /br/ (Portuguese as default)
-return Astro.redirect('/br/', 301);
+// Root redirect page
 ---
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Loading...</title>
+    <style>
+        body { margin: 0; padding: 0; background: #f9fafb; }
+    </style>
+</head>
+<body>
+    <script is:inline>
+        // Immediate redirect based on domain
+        (function() {
+            const host = window.location.hostname;
+            
+            // Check .com.br first (more specific)
+            if (host.endsWith('.com.br') || host === 'evertramos.com.br') {
+                window.location.replace('/br/');
+            } 
+            // Then check .com (but not .com.br)
+            else if ((host.endsWith('.com') || host === 'evertramos.com') && !host.includes('.br')) {
+                window.location.replace('/en/');
+            } 
+            // Default to English
+            else {
+                window.location.replace('/en/');
+            }
+        })();
+    </script>
+</body>
+</html>
