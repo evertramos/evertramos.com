@@ -12,19 +12,7 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const alternateUrl = getAlternateUrl(Astro.url, lang);
 
-// Dynamic CSP based on environment
-const isProduction = import.meta.env.PROD;
-const backendUrl = isProduction ? 'https://pay.evertramos.com.br' : 'http://localhost:8000';
-const csp = [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://js.stripe.com https://challenges.cloudflare.com https://static.cloudflareinsights.com",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https:",
-  `connect-src 'self' https://api.stripe.com https://merchant-ui-api.stripe.com https://challenges.cloudflare.com https://cloudflareinsights.com ${backendUrl}`,
-  "frame-src 'self' https://challenges.cloudflare.com https://js.stripe.com",
-  "object-src 'none'",
-  "base-uri 'self'"
-].join('; ') + ';';
+// CSP handled by nginx for better security
 ---
 
 <!DOCTYPE html>
@@ -36,10 +24,7 @@ const csp = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
     
-    <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content={csp} />
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <!-- Security Headers handled by nginx -->
     
     <!-- Block Search Engines -->
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
