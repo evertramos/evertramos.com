@@ -10,11 +10,16 @@
         // Immediate redirect based on domain
         (function() {
             const host = window.location.hostname;
-            if (host.includes('.com.br') || host === 'evertramos.com.br') {
+            // Check .com.br first (more specific)
+            if (host.endsWith('.com.br') || host === 'evertramos.com.br') {
                 window.location.replace('/br/');
-            } else if (host.includes('.com') || host === 'evertramos.com') {
+            } 
+            // Then check .com (but not .com.br)
+            else if ((host.endsWith('.com') || host === 'evertramos.com') && !host.includes('.br')) {
                 window.location.replace('/en/');
-            } else {
+            } 
+            // Default to English
+            else {
                 window.location.replace('/en/');
             }
         })();
