@@ -3,17 +3,24 @@ import tailwind from '@astrojs/tailwind';
 import vue from '@astrojs/vue';
 
 export default defineConfig({
+  output: 'static',
   build: {
-    inlineStylesheets: 'auto'
+    inlineStylesheets: 'auto',
+    assets: '_astro'
   },
   vite: {
     define: {
       'import.meta.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL': JSON.stringify(process.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL)
     },
     build: {
+      minify: 'esbuild',
+      cssMinify: 'esbuild',
       sourcemap: false,
-      minify: true,
-      cssMinify: true
+      rollupOptions: {
+        output: {
+          manualChunks: undefined
+        }
+      }
     }
   },
   integrations: [tailwind(), vue()],
