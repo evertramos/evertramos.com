@@ -3,13 +3,17 @@ import tailwind from '@astrojs/tailwind';
 import vue from '@astrojs/vue';
 
 export default defineConfig({
+  build: {
+    inlineStylesheets: 'auto'
+  },
   vite: {
     define: {
       'import.meta.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL': JSON.stringify(process.env.PUBLIC_STRIPE_CUSTOMER_PORTAL_URL)
     },
     build: {
       sourcemap: false,
-      minify: 'esbuild'
+      minify: true,
+      cssMinify: true
     }
   },
   integrations: [tailwind(), vue()],
