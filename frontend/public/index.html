@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <script>
+        // Redirect based on domain
+        const host = window.location.hostname;
+        if (host.endsWith('.com.br')) {
+            window.location.href = '/br/';
+        } else {
+            window.location.href = '/en/';
+        }
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>
