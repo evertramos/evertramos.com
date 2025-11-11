@@ -28,27 +28,11 @@ const alternateUrl = getAlternateUrl(Astro.url, lang);
     
     <!-- Block Search Engines -->
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
+    
+
     <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
     <meta name="duckduckbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
-    
-    <!-- Block Cloudflare Insights beacon -->
-    <script>
-      // Block Cloudflare Insights from loading automatically
-      if (window.__CF$cv$params) {
-        delete window.__CF$cv$params;
-      }
-      
-      // Override fetch to block beacon requests
-      const originalFetch = window.fetch;
-      window.fetch = function(...args) {
-        const url = args[0];
-        if (typeof url === 'string' && url.includes('cloudflareinsights.com')) {
-          return Promise.reject(new Error('Blocked Cloudflare Insights'));
-        }
-        return originalFetch.apply(this, args);
-      };
-    </script>
     
     <!-- Custom head content -->
     <slot name="head" />
@@ -139,7 +123,7 @@ const alternateUrl = getAlternateUrl(Astro.url, lang);
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
             <a href={lang === 'br' ? '/br/' : '/en/'} class="flex items-center space-x-3">
-              <img src="/images/logo.svg" alt="Evert Ramos" class="h-10 w-10" />
+              <img src="/images/logo.svg" alt="Evert Ramos" class="h-8 w-8 rounded-full" />
               <span class="text-xl font-bold text-gray-800">ER</span>
             </a>
           </div>

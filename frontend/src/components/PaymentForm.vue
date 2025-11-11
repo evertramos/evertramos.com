@@ -280,7 +280,7 @@ const initializeTurnstile = () => {
     
     turnstile = window.turnstile.render('#turnstile-widget', {
       sitekey: sitekey,
-      language: props.lang, // Set language based on page language
+      language: props.lang === 'br' ? 'pt' : props.lang, // Map 'br' to 'pt' for Turnstile
       callback: (token: string) => {
         turnstileToken.value = token
         turnstileError.value = ''
@@ -401,7 +401,7 @@ const handleSubmit = async () => {
       currency: form.currency,
       payment_type: form.paymentType,
       turnstile_token: turnstileToken.value,
-      language: props.lang // Send user's language
+      language: props.lang === 'br' ? 'pt' : props.lang // Map 'br' to 'pt' for backend
     }
     
     // Create payment on backend
